@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace StayAwake;
 
 public sealed class StayAwakeWorker : IDisposable
@@ -6,6 +8,10 @@ public sealed class StayAwakeWorker : IDisposable
     private PeriodicTimer? _timer;
     private CancellationTokenSource? _cts;
     private Task? _loopTask;
+
+    private AppStatus _lastNotifiedStatus = AppStatus.Disabled;
+    private DateTime? _lastNotifiedLastMoved;
+    private int? _lastNotifiedRemainingSeconds;
 
     public StayAwakeWorker(AppSettings settings)
     {
@@ -43,6 +49,8 @@ public sealed class StayAwakeWorker : IDisposable
         _cts = new CancellationTokenSource();
         _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
         UpdateStatus();
+        ResetNotificationSnapshot();
+        NotifyStatusChanged();
         _loopTask = RunLoopAsync(_cts.Token);
     }
 
@@ -56,6 +64,7 @@ public sealed class StayAwakeWorker : IDisposable
         _cts = null;
     }
 
+    /// <summary>Starts a session; updates <see cref="AppSettings.Enabled"/> for persistence.</summary>
     public void StartSession(TimeSpan? duration)
     {
         SessionStartedAt = DateTime.UtcNow;
@@ -64,9 +73,10 @@ public sealed class StayAwakeWorker : IDisposable
         LastMoved = null;
         Status = AppStatus.Active;
         SyncKeepAwake();
-        StatusChanged?.Invoke();
+        NotifyStatusChanged();
     }
 
+    /// <summary>Stops a session; clears runtime timestamps and <see cref="AppSettings.Enabled"/>.</summary>
     public void StopSession()
     {
         _settings.Enabled = false;
@@ -75,39 +85,53 @@ public sealed class StayAwakeWorker : IDisposable
         LastMoved = null;
         Status = AppStatus.Disabled;
         SyncKeepAwake();
-        StatusChanged?.Invoke();
+        NotifyStatusChanged();
     }
 
     private async Task RunLoopAsync(CancellationToken ct)
     {
-        while (_timer is not null && await _timer.WaitForNextTickAsync(ct))
+        while (_timer is not null)
         {
-            if (IsSessionExpired())
+            try
             {
-                CompleteSession();
-                continue;
+                if (!await _timer.WaitForNextTickAsync(ct))
+                    break;
+
+                if (IsSessionExpired())
+                {
+                    CompleteSession();
+                    continue;
+                }
+
+                UpdateStatus();
+                NotifyStatusChangedIfNeeded();
+
+                if (!_settings.Enabled || Status != AppStatus.Active)
+                    continue;
+
+                var idleSeconds = NativeMethods.GetIdleSeconds();
+                if (idleSeconds < _settings.IdleSeconds)
+                    continue;
+
+                var secondsSinceLastJiggle = LastMoved is null
+                    ? double.MaxValue
+                    : (DateTime.UtcNow - LastMoved.Value).TotalSeconds;
+
+                if (secondsSinceLastJiggle < _settings.IdleSeconds)
+                    continue;
+
+                NativeMethods.JiggleMouse(_settings.MovementPixels, _settings.MovementMode);
+                LastMoved = DateTime.UtcNow;
+                NotifyStatusChanged();
             }
-
-            UpdateStatus();
-            StatusChanged?.Invoke();
-
-            if (!_settings.Enabled || Status != AppStatus.Active)
-                continue;
-
-            var idleSeconds = NativeMethods.GetIdleSeconds();
-            if (idleSeconds < _settings.IdleSeconds)
-                continue;
-
-            var secondsSinceLastJiggle = LastMoved is null
-                ? double.MaxValue
-                : (DateTime.Now - LastMoved.Value).TotalSeconds;
-
-            if (secondsSinceLastJiggle < _settings.IdleSeconds)
-                continue;
-
-            NativeMethods.JiggleMouse(_settings.MovementPixels, _settings.MovementMode);
-            LastMoved = DateTime.Now;
-            StatusChanged?.Invoke();
+            catch (OperationCanceledException) when (ct.IsCancellationRequested)
+            {
+                break;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"StayAwake worker tick failed: {ex}");
+            }
         }
     }
 
@@ -124,6 +148,7 @@ public sealed class StayAwakeWorker : IDisposable
         LastMoved = null;
         Status = AppStatus.SessionCompleted;
         SyncKeepAwake();
+        NotifyStatusChanged();
         SessionCompleted?.Invoke();
     }
 
@@ -147,6 +172,37 @@ public sealed class StayAwakeWorker : IDisposable
     }
 
     private void SyncKeepAwake() => NativeMethods.SetKeepAwake(Status == AppStatus.Active);
+
+    private static int? GetRemainingSecondsKey(TimeSpan? remaining) =>
+        remaining is null ? null : Math.Max(0, (int)remaining.Value.TotalSeconds);
+
+    private int? CurrentRemainingSecondsKey() => GetRemainingSecondsKey(RemainingTime);
+
+    private void ResetNotificationSnapshot()
+    {
+        _lastNotifiedStatus = Status;
+        _lastNotifiedLastMoved = LastMoved;
+        _lastNotifiedRemainingSeconds = CurrentRemainingSecondsKey();
+    }
+
+    private void NotifyStatusChanged()
+    {
+        ResetNotificationSnapshot();
+        StatusChanged?.Invoke();
+    }
+
+    private void NotifyStatusChangedIfNeeded()
+    {
+        var remainingKey = CurrentRemainingSecondsKey();
+        if (Status == _lastNotifiedStatus
+            && LastMoved == _lastNotifiedLastMoved
+            && remainingKey == _lastNotifiedRemainingSeconds)
+        {
+            return;
+        }
+
+        NotifyStatusChanged();
+    }
 
     public void Dispose() => Stop();
 }

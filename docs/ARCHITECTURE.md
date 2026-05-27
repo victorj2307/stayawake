@@ -299,7 +299,7 @@ return idleMs / 1000.0;
 
 Returns seconds since the last **real** keyboard or mouse input system-wide. Uses `Environment.TickCount` delta (handles 32-bit wrap via `unchecked`).
 
-**On failure:** returns `0` → idle gate never passes → no jiggling (silent fail-safe).
+**On failure:** returns `86400` seconds (24 hours, fail-open) so the idle gate still passes and jiggling can continue if the API is unavailable.
 
 ### `SendInput` — mouse jiggle
 
@@ -475,19 +475,24 @@ On session expiry: 3-second info balloon — "Session completed".
 
 | Thread | Work |
 |--------|------|
-| UI (WPF dispatcher) | Window, bindings, `MainViewModel.RefreshAll` |
+| UI (WPF dispatcher) | Window, bindings; timer updates use `NotifyStatusProperties` |
 | Thread pool | `StayAwakeWorker.RunLoopAsync` (timer ticks) |
 
 ### Events
 
 | Event | Source | Subscribers | Marshaling |
 |-------|--------|-------------|------------|
-| `StatusChanged` | Worker (every ~1s while running) | `MainViewModel`, `TrayIconManager` | VM and tray: UI dispatcher |
-| `SessionCompleted` | Worker (on expiry) | `MainViewModel`, `App` | VM: `RefreshAll` via dispatcher; App: save + balloon only |
+| `StatusChanged` | Worker when runtime snapshot changes | `MainViewModel`, `TrayIconManager` | VM: `NotifyStatusProperties` (or `Enabled` + status on `SessionCompleted`); tray: tooltip on dispatcher |
+| `SessionCompleted` | Worker (on expiry) | `MainViewModel`, `App` | VM: `Enabled` + status properties; App: save + balloon only |
+
+### Worker vs ViewModel on `StatusChanged`
+
+- **Worker** compares runtime-only snapshot: `Status`, `LastMoved` (UTC), remaining seconds (`int?`, `null` when unlimited).
+- **ViewModel** formats display strings (`RemainingDisplayText`, `LastMovementValue` in local time) and notifies only status-related bindings on timer ticks—not `MovementMode`, settings text fields, etc.
+- **Configuration refresh** (`RefreshAll`) runs on user/session actions (`StartSession`, `StopSession`, reset), not every timer tick.
 
 ### Notes
 
-- **High-frequency `StatusChanged`** — fires every second while the loop runs (acceptable at this scale).
 - **Single instance** — `Mutex` in `App.OnStartup` prevents a second process.
 - **Screenshot helper** — `STAYAWAKE_SCREENSHOT=session-completed` starts a 1s session before show (used by `scripts/capture-screenshots.ps1` only).
 
@@ -512,22 +517,10 @@ On session expiry: 3-second info balloon — "Session completed".
 
 ## 13. Weaknesses and risks
 
-Pragmatic issues worth knowing—not blockers for a personal utility.
+### Intentional design notes
 
-### Shared mutable state
-
-- Single `AppSettings` instance shared by worker and ViewModel; both write `Enabled`.
-- Tray session presets vs UI "Run duration (hours)" can disagree in persisted settings.
-
-### Robustness
-
-- `GetLastInputInfo` failure → zero idle → never jiggles (silent).
-- `RunLoopAsync` has no top-level exception handling.
-
-### Minor inconsistencies
-
-- `LastMoved` uses local time; session timestamps use UTC.
-- `StatusChanged` fires every tick (1 Hz UI churn while active).
+- Single shared `AppSettings` instance; **worker** owns session lifecycle and writes `Enabled` during start/stop/complete.
+- Tray **30 minutes** preset does not update `sessionDurationHours` (whole-hour and indefinite presets do sync). The status sidebar **remaining** time always reflects the active session.
 
 ### Product limitations (by design)
 

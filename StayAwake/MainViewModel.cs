@@ -28,7 +28,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _sessionDurationHoursText = _settings.SessionDurationHours.ToString(CultureInfo.InvariantCulture);
 
         _worker.StatusChanged += OnWorkerStatusChanged;
-        _worker.SessionCompleted += OnWorkerStatusChanged;
+        _worker.SessionCompleted += OnSessionCompleted;
 
         ResetSettingsCommand = new RelayCommand(ResetToDefaults, () => CanEditSettings);
 
@@ -74,7 +74,15 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public void StartSession(TimeSpan? duration)
     {
         _worker.StartSession(duration);
+
+        if (duration is { TotalHours: >= 1 } d)
+            _settings.SessionDurationHours = (int)d.TotalHours;
+        else if (duration is null)
+            _settings.SessionDurationHours = 0;
+
         OnPropertyChanged(nameof(Enabled));
+        OnPropertyChanged(nameof(SessionDurationHours));
+        SyncSessionDurationHoursText(_settings.SessionDurationHours);
         Save();
         RefreshAll();
     }
@@ -282,7 +290,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
     }
 
     public string LastMovementValue =>
-        _worker.LastMoved is null ? "Never" : _worker.LastMoved.Value.ToString("HH:mm:ss");
+        _worker.LastMoved is null
+            ? "Never"
+            : _worker.LastMoved.Value.ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 
     public void RefreshAll()
     {
@@ -320,10 +330,17 @@ public sealed class MainViewModel : INotifyPropertyChanged
         RefreshAll();
     }
 
-    private void OnWorkerStatusChanged() => _dispatcher.Invoke(RefreshAll);
+    private void OnWorkerStatusChanged() => _dispatcher.Invoke(NotifyStatusProperties);
+
+    private void OnSessionCompleted() => _dispatcher.Invoke(() =>
+    {
+        OnPropertyChanged(nameof(Enabled));
+        NotifyStatusProperties();
+    });
 
     private void NotifyStatusProperties()
     {
+        OnPropertyChanged(nameof(Status));
         OnPropertyChanged(nameof(StatusPillText));
         OnPropertyChanged(nameof(RemainingTimeValue));
         OnPropertyChanged(nameof(RemainingDisplayText));

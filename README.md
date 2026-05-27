@@ -275,11 +275,9 @@ Tray presets start sessions directly and do not change `sessionDurationHours` in
 
 ## Known limitations
 
-- `GetLastInputInfo` failure silently prevents jiggling.
-- Tray presets do not update `sessionDurationHours` in saved settings.
-- High-frequency status refresh (1 Hz) while active.
+- Tray **30 minutes** preset does not update the **Run duration (hours)** field (1h/3h/indefinite presets sync where applicable). Remaining time in the status panel always reflects the active session.
 
-Details: [docs/ARCHITECTURE.md § Weaknesses](docs/ARCHITECTURE.md#13-weaknesses-and-risks).
+Platform and policy constraints: [docs/ARCHITECTURE.md §13](docs/ARCHITECTURE.md#13-weaknesses-and-risks).
 
 ---
 

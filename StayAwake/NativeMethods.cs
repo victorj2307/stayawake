@@ -46,12 +46,15 @@ internal static class NativeMethods
     [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     private static extern uint SetThreadExecutionState(uint esFlags);
 
-    /// <summary>Seconds since last keyboard/mouse input.</summary>
+    /// <summary>Treat as idle when GetLastInputInfo is unavailable (fail-open for keep-awake).</summary>
+    private const double FailOpenIdleSeconds = 86400;
+
+    /// <summary>Seconds since last keyboard/mouse input. Returns <see cref="FailOpenIdleSeconds"/> if the API call fails.</summary>
     internal static double GetIdleSeconds()
     {
         var info = new LASTINPUTINFO { cbSize = (uint)Marshal.SizeOf<LASTINPUTINFO>() };
         if (!GetLastInputInfo(ref info))
-            return 0;
+            return FailOpenIdleSeconds;
 
         var idleMs = unchecked((uint)Environment.TickCount - info.dwTime);
         return idleMs / 1000.0;
