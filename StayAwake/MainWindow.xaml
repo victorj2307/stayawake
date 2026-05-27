@@ -1,0 +1,239 @@
+﻿<Window x:Class="StayAwake.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="StayAwake"
+        Width="680"
+        SizeToContent="Height"
+        MinHeight="400"
+        MaxHeight="560"
+        MinWidth="600"
+        ResizeMode="CanMinimize"
+        Background="{StaticResource WindowBg}"
+        Foreground="{StaticResource TextPrimary}"
+        FontFamily="Segoe UI"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Width="36" Height="36"
+                   Margin="0,0,12,0"
+                   VerticalAlignment="Center"
+                   RenderOptions.BitmapScalingMode="HighQuality">
+                <Image.Source>
+                    <BitmapImage UriSource="pack://application:,,,/Assets/app-header.png"/>
+                </Image.Source>
+            </Image>
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Text="StayAwake"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource TextPrimary}"/>
+                <TextBlock Text="Keep Windows awake when you need it"
+                           FontSize="12"
+                           Foreground="{StaticResource TextSecondary}"
+                           Margin="0,2,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Content -->
+        <Grid Grid.Row="1" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="200"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Main settings -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource CardBorder}" Margin="0,0,0,10" Padding="12,8">
+                    <Grid Height="36">
+                        <TextBlock Text="Enabled"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                        <ToggleButton Style="{StaticResource UtilityToggleLarge}"
+                                      IsChecked="{Binding Enabled}"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <Grid Grid.Row="1" IsEnabled="{Binding CanEditSettings}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Style="{StaticResource SettingRow}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="28"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="140"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="&#xE121;" Style="{StaticResource IconGlyph}"/>
+                        <TextBlock Grid.Column="1" Text="Idle time (seconds)" Style="{StaticResource SettingLabel}"/>
+                        <TextBox Grid.Column="2"
+                                 Style="{StaticResource UtilityTextBox}"
+                                 Text="{Binding IdleSecondsText, UpdateSourceTrigger=LostFocus}"
+                                 LostFocus="NumericField_LostFocus"/>
+                    </Grid>
+
+                    <Grid Grid.Row="1" Style="{StaticResource SettingRow}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="28"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="140"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="&#xE962;" Style="{StaticResource IconGlyph}"/>
+                        <TextBlock Grid.Column="1" Text="Movement (pixels)" Style="{StaticResource SettingLabel}"/>
+                        <TextBox Grid.Column="2"
+                                 Style="{StaticResource UtilityTextBox}"
+                                 Text="{Binding MovementPixelsText, UpdateSourceTrigger=LostFocus}"
+                                 LostFocus="NumericField_LostFocus"/>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Style="{StaticResource SettingRow}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="28"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="140"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="&#xE8B8;" Style="{StaticResource IconGlyph}"/>
+                        <TextBlock Grid.Column="1" Text="Movement direction" Style="{StaticResource SettingLabel}"/>
+                        <ComboBox Grid.Column="2"
+                                  Style="{StaticResource UtilityComboBox}"
+                                  ItemContainerStyle="{StaticResource UtilityComboBoxItem}"
+                                  ItemsSource="{Binding MovementModes}"
+                                  SelectedItem="{Binding MovementMode}"/>
+                    </Grid>
+
+                    <Grid Grid.Row="3" Style="{StaticResource SettingRow}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="28"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="140"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="&#xE823;" Style="{StaticResource IconGlyph}"/>
+                        <TextBlock Grid.Column="1" Text="Run duration (hours)" Style="{StaticResource SettingLabel}"/>
+                        <TextBox Grid.Column="2"
+                                 Style="{StaticResource UtilityTextBox}"
+                                 Text="{Binding SessionDurationHoursText, UpdateSourceTrigger=LostFocus}"
+                                 LostFocus="NumericField_LostFocus"/>
+                    </Grid>
+
+                    <Grid Grid.Row="4" Style="{StaticResource SettingRowLast}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="28"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="140"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="&#xE74A;" Style="{StaticResource IconGlyph}"/>
+                        <TextBlock Grid.Column="1" Text="Minimize to tray" Style="{StaticResource SettingLabel}"/>
+                        <ToggleButton Grid.Column="2"
+                                      Style="{StaticResource UtilityToggle}"
+                                      IsChecked="{Binding MinimizeToTray}"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Center"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+
+            <!-- Status -->
+            <Border Grid.Column="2" Style="{StaticResource CardBorder}" Padding="10,10" VerticalAlignment="Top">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="Status"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource AccentGreen}"
+                               Margin="0,0,0,6"/>
+
+                    <Grid Grid.Row="1" Style="{StaticResource StatusRow}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="State" Style="{StaticResource StatusLabel}"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Ellipse Style="{StaticResource StatusDot}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding StatusPillText}"
+                                       FontSize="12"
+                                       Foreground="{StaticResource TextPrimary}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Style="{StaticResource StatusRow}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Remaining" Style="{StaticResource StatusLabel}"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding RemainingDisplayText}"
+                                   FontSize="12"
+                                   Foreground="{StaticResource AccentGreen}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <Grid Grid.Row="3" Style="{StaticResource StatusRowLast}" Margin="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Last movement" Style="{StaticResource StatusLabel}"/>
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding LastMovementValue}"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextSecondary}"
+                                   HorizontalAlignment="Right"
+                                   VerticalAlignment="Center"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Footer -->
+        <Grid Grid.Row="2" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding FooterVersionText}"
+                       FontSize="11"
+                       Foreground="{StaticResource TextMuted}"
+                       VerticalAlignment="Center"/>
+            <Button Grid.Column="1"
+                    Content="Reset settings"
+                    Style="{StaticResource FooterResetButton}"
+                    Command="{Binding ResetSettingsCommand}"/>
+        </Grid>
+    </Grid>
+</Window>
