@@ -216,7 +216,7 @@ Called when `IsSessionExpired()` is true on a timer tick.
 4. `SyncKeepAwake(false)`
 5. `SessionCompleted` event
 
-**App handler on `SessionCompleted`:** save settings, show tray balloon, `viewModel.RefreshAll()`.
+**App handler on `SessionCompleted`:** save settings, show tray balloon. ViewModel updates `Enabled` and status bindings via `OnSessionCompleted`.
 
 ### `UpdateStatus()` (private)
 
@@ -246,28 +246,28 @@ Checked at the start of each 1-second tick before jiggle logic.
 ### Pseudocode
 
 ```
-every 1 second:
+every 1 second (try/catch per tick; continue on unexpected errors):
     if session expired:
         CompleteSession()
         continue
 
     UpdateStatus()
-    fire StatusChanged
+    notify StatusChanged only if Status, LastMoved (UTC), or remaining-seconds snapshot changed
 
     if not enabled OR status != Active:
         continue
 
-    idleSeconds = GetLastInputInfo-based idle time
+    idleSeconds = GetLastInputInfo-based idle time (86400s fail-open if API fails)
     if idleSeconds < settings.IdleSeconds:
         continue   // user recently active
 
-    secondsSinceLastJiggle = now - LastMoved (or infinity if never)
+    secondsSinceLastJiggle = UtcNow - LastMoved (or infinity if never)
     if secondsSinceLastJiggle < settings.IdleSeconds:
         continue   // rate limit: don't jiggle every tick while idle
 
     JiggleMouse(pixels, movementMode)
-    LastMoved = now
-    fire StatusChanged
+    LastMoved = UtcNow
+    fire StatusChanged (always)
 ```
 
 ### Idle detection vs rate limiting
