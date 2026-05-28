@@ -600,6 +600,7 @@ Do not add: cloud sync, accounts, telemetry, plugins, schedulers, enterprise das
 | `Assets/*` | Icons (EXE + tray states + header); see `Assets/ICON.md` |
 | `scripts/generate-icon.py` | Regenerate `.ico` and header PNG from source |
 | `scripts/capture-screenshots.ps1` | Automated window captures for README |
+| `scripts/ScreenshotTool/` | Helper executable used by `capture-screenshots.ps1` |
 | `scripts/release.ps1` | Publish, zip, tag, and GitHub Release (see README) |
 | `docs/screenshots/` | README screenshot assets |
 

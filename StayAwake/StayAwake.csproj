@@ -15,6 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="scripts\ScreenshotTool\**\*"/>
+    <None Remove="scripts\ScreenshotTool\**\*"/>
     <None Include="Assets\app-icon-source.png"/>
     <Resource Include="Assets\app.ico"/>
     <Resource Include="Assets\app-tray-disabled.ico"/>

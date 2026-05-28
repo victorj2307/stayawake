@@ -36,11 +36,7 @@ From the repo root (after Release build):
 .\StayAwake\scripts\capture-screenshots.ps1
 ```
 
-This captures the three main-window states. `tray-menu.png` is generated via:
-
-```powershell
-python StayAwake\scripts\generate-tray-menu-screenshot.py
-```
+This runs `ScreenshotTool` (main-window states) and `generate-tray-menu-screenshot.py` (`tray-menu.png`).
 
 The script uses `STAYAWAKE_SCREENSHOT=session-completed` for the completed-state capture (1-second session before window show).
 
