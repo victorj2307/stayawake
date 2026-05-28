@@ -359,6 +359,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 - JSON, camelCase property names, indented.
 - `System.Text.Json` serialize/deserialize.
 - Load errors → new `AppSettings()` with defaults.
+- After deserialize, `SettingLimits.Normalize()` clamps numeric fields; file is re-saved if any value changed.
 - Save errors → swallowed (utility continues without persisting).
 
 ### Default values (`AppSettings`)
@@ -372,6 +373,14 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 | `MovementMode` | `Horizontal` (enum) |
 | `SessionDurationHours` | `0` (unlimited when starting from UI) |
 | `SessionDurationMinutes` | `null` (when set, e.g. `30`, overrides hours for default duration) |
+
+### Numeric bounds and UI steps (`SettingLimits`)
+
+| Setting | Min | Max | UI step (button / key / wheel) |
+|---------|-----|-----|--------------------------------|
+| `IdleSeconds` | 10 | 3600 | 10 |
+| `MovementPixels` | 1 | 10 | 1 |
+| `SessionDurationHours` | 0 | 99 | 1 |
 
 ### When settings are saved
 
@@ -388,6 +397,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 
 - **Compact utility:** one window, no navigation, no dashboard.
 - **Dark theme:** `#141414` window background, card-based layout, custom toggle/combo/textbox styles in `App.xaml`.
+- **Keyboard focus:** custom templates use an `AccentGreen` border on `IsKeyboardFocused` (and `IsKeyboardFocusWithin` / `IsDropDownOpen` where needed); default `FocusVisualStyle` is disabled so Tab navigation matches mouse focus on inputs.
 - **Session-oriented:** master "Enabled" toggle starts a session; settings lock while active.
 - **Status at a glance:** right column shows state, remaining time (or session ended date/time when completed), last movement time.
 
@@ -405,9 +415,26 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 
 - **Booleans:** direct bind (`Enabled`, `MinimizeToTray`).
 - **Movement direction:** `MovementMode` enum bound to ComboBox `ItemsSource` / `SelectedItem`.
-- **Numeric fields:** string properties (`IdleSecondsText`, etc.) with `UpdateSourceTrigger=LostFocus`; parse and clamp on set; revert invalid text on `LostFocus` via `RevertInvalidNumericFields`.
-- **Clamps:** idle 10–3600 s, pixels 1–10, session hours 0–99.
+- **Numeric fields:** string properties (`IdleSecondsText`, etc.) with `UpdateSourceTrigger=LostFocus`; parse and clamp on set via `SettingLimits`; revert invalid text on `LostFocus` via `RevertInvalidNumericFields` (deferred one dispatcher tick so binding runs first).
+- **Range hints:** muted `SettingHint` text under idle, movement, and run duration labels (constants on `SettingLimits`).
+- **Input guards:** digits-only `PreviewTextInput`, `MaxLength` (4 / 2 / 2), clamp on blur; values normalized on load via `SettingLimits.Normalize`.
+- **Numeric steppers:** [`NumericStepper`](StayAwake/NumericStepper.xaml) composite control (140×36) with up/down `RepeatButton`s, keyboard Up/Down, and mouse wheel (scroll up increases, scroll down decreases); step sizes from `SettingLimits` (idle 10 s, movement 1 px, run duration 1 h). Stepping updates the bound `*Text` property and pushes to the ViewModel immediately via `UpdateSource()`.
+- **Clamps:** idle 10–3600 s, pixels 1–10, session hours 0–99 (single source in `SettingLimits.cs`).
 - **Status row 2:** `RemainingLabelText` (`"Remaining"` or `"Session ended"`) and `RemainingDisplayText` (countdown, `"Unlimited"`, ended-at via `SessionDisplay.FormatSessionEndedAt`, or `"—"`).
+
+### Keyboard focus styling
+
+All tab stops in the settings UI share the same visible focus treatment:
+
+| Control | Style key | Focus indicator |
+|---------|-----------|-----------------|
+| Enabled / Minimize to tray | `UtilityToggleLarge` / `UtilityToggle` | Green border on switch track |
+| Numeric fields | `NumericStepper` | Green border on outer composite (`PART_TextBox.IsKeyboardFocused`; border colors live in `Border.Style` setters, not local values, so triggers apply) |
+| Movement direction | `UtilityComboBox` | Green border when focused, focus-within, or dropdown open |
+| Duration presets | `UtilityPresetChip` | Green border on chip; preferred state no longer overrides border so focus stays visible |
+| Reset settings | `FooterResetButton` | Green border on button |
+
+`FocusVisualStyle="{x:Null}"` on these controls suppresses the default WPF dashed adorner, which is hard to see on the dark palette.
 
 ### `CanEditSettings`
 
@@ -427,6 +454,8 @@ If `MinimizeToTray` is true:
 
 - **Close (X):** cancel close, `Hide()` window (app keeps running).
 - **Minimize:** hide window instead of taskbar minimize.
+
+`HideToTray()` shows a tray balloon (when `MinimizeToTray` is on) so users know the app is still in the notification area. Same balloon is shown when the user starts a session with minimize-to-tray enabled (`SessionStarted` in `App.xaml.cs`, skipped on silent restore at startup). Identical running-in-tray balloons are cooldown-limited to 15 seconds in `TrayIconManager`.
 
 Tray and worker continue until Exit from tray menu or close without minimize-to-tray.
 
@@ -478,9 +507,15 @@ Updated on `StatusChanged`, marshaled to the UI dispatcher:
 
 Truncated to 63 characters (NotifyIcon limit).
 
-### Balloon notification
+### Balloon notifications
 
-On session expiry: 3-second info balloon — "Session completed".
+| When | Message |
+|------|---------|
+| Timed session expires | "Session completed" |
+| Session started with **Minimize to tray** (user-initiated) | "Still running in the system tray. Double-click the icon to open settings." |
+| Window hidden to tray (close/minimize) | Same running-in-tray body (15 s cooldown vs duplicate) |
+
+All use `NotifyIcon.ShowBalloonTip` (3 s, Info icon). Not shown on startup when `"enabled": true` is restored from `settings.json`.
 
 ---
 
@@ -557,6 +592,14 @@ Prioritized for the **minimalist utility** philosophy. See README roadmap for a 
 | Custom vector icon replacing Flaticon source | Fully owned branding; schedule for v1.2+ |
 | README / social screenshot refresh after icon pass | Keeps marketing aligned with UI |
 
+### Shipped in v1.2.0
+
+- `SettingLimits` — shared bounds, UI hints, load-time normalize
+- Numeric field hints and input guards (digits, max length, clamp on blur, normalize on load)
+- `NumericStepper` controls (spinner buttons, Up/Down keys, mouse wheel)
+- Consistent Tab focus styling across settings controls
+- Tray “running in tray” balloon on session start (minimize-to-tray) and hide-to-tray
+
 ### Shipped in v1.1.0
 
 - Tray icon visual state (active / disabled / completed)
@@ -581,9 +624,11 @@ Do not add: cloud sync, accounts, telemetry, plugins, schedulers, enterprise das
 
 | File | Responsibility |
 |------|----------------|
-| `App.xaml` | Global resources: dark palette, card/toggle/combo/textbox styles, status dot triggers |
+| `App.xaml` | Global resources: dark palette, control styles, keyboard focus triggers, status dot triggers |
 | `App.xaml.cs` | Composition root, single-instance mutex, session-completed side effects |
 | `AppSettings.cs` | Settings property bag |
+| `SettingLimits.cs` | Numeric min/max/step, clamp helpers, range hint strings |
+| `NumericStepper.xaml` | Stepped numeric input (text, up/down buttons, keyboard, mouse wheel, focus border) |
 | `AppStatus.cs` | `Active`, `Disabled`, `SessionCompleted` |
 | `MovementMode.cs` | Movement direction enum |
 | `MovementModeJsonConverter.cs` | Tolerant JSON enum serialization |
@@ -623,4 +668,4 @@ Releases are driven by [`scripts/release.ps1`](../scripts/release.ps1) on Window
 
 ---
 
-*Last updated: v1.1.0 — tray icon states, UI presets, develop branch — .NET 8 / single-project WPF utility.*
+*Last updated: v1.2.0 — setting bounds, numeric steppers, keyboard focus, tray-running balloon — .NET 8 / single-project WPF utility.*

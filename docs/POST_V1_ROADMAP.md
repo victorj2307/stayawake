@@ -13,7 +13,14 @@ Summary of the first iteration after the stable v1.0.0 release. See [BRANCHING.m
 | **Preset chip semantics** | Highlight = saved preference only; runtime state = tray, status card, **Enabled** |
 | **Post-ship fixes (in v1.1.0)** | Mutex release on exit; preset chips aligned to 140px value column |
 
-## v1.2 (optional, not blocking)
+## Shipped in v1.2.0
+
+| Initiative | Summary |
+|------------|---------|
+| **Setting bounds** | `SettingLimits`, muted range hints, digits/max-length guards, normalize on load, `NumericStepper` (buttons, Up/Down, mouse wheel), Tab focus styling |
+| **Tray-running balloon** | Notify when session starts with minimize-to-tray or window hides to tray (15 s cooldown) |
+
+## v1.2+ (optional, not blocking)
 
 | Initiative | Summary |
 |------------|---------|

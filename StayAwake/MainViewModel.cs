@@ -31,16 +31,23 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _worker.SessionCompleted += OnSessionCompleted;
 
         ResetSettingsCommand = new RelayCommand(ResetToDefaults, () => CanEditSettings);
-        StartPreset30mCommand = new RelayCommand(() => StartSession(TimeSpan.FromMinutes(30)), () => CanEditSettings);
-        StartPreset1hCommand = new RelayCommand(() => StartSession(TimeSpan.FromHours(1)), () => CanEditSettings);
-        StartPreset3hCommand = new RelayCommand(() => StartSession(TimeSpan.FromHours(3)), () => CanEditSettings);
-        StartPresetIndefiniteCommand = new RelayCommand(() => StartSession(null), () => CanEditSettings);
+        StartPreset30mCommand = new RelayCommand(() => StartSession(TimeSpan.FromMinutes(30), fromSettingsRestore: false), () => CanEditSettings);
+        StartPreset1hCommand = new RelayCommand(() => StartSession(TimeSpan.FromHours(1), fromSettingsRestore: false), () => CanEditSettings);
+        StartPreset3hCommand = new RelayCommand(() => StartSession(TimeSpan.FromHours(3), fromSettingsRestore: false), () => CanEditSettings);
+        StartPresetIndefiniteCommand = new RelayCommand(() => StartSession(null, fromSettingsRestore: false), () => CanEditSettings);
 
         if (_settings.Enabled)
             _worker.StartSession(SessionDurationFromSettings());
     }
 
+    /// <summary>Raised after <see cref="StartSession"/>; argument is true when restoring from persisted settings at startup (no tray hint).</summary>
+    public event Action<bool>? SessionStarted;
+
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public string IdleSecondsRangeHint => SettingLimits.IdleSecondsRangeHint;
+    public string MovementPixelsRangeHint => SettingLimits.MovementPixelsRangeHint;
+    public string SessionDurationHoursRangeHint => SettingLimits.SessionDurationHoursRangeHint;
 
     public ICommand ResetSettingsCommand { get; }
     public ICommand StartPreset30mCommand { get; }
@@ -68,13 +75,13 @@ public sealed class MainViewModel : INotifyPropertyChanged
                 return;
 
             if (value)
-                StartSession(SessionDurationFromSettings());
+                StartSession(SessionDurationFromSettings(), fromSettingsRestore: false);
             else
                 StopSession();
         }
     }
 
-    public void StartSession(TimeSpan? duration)
+    public void StartSession(TimeSpan? duration, bool fromSettingsRestore = false)
     {
         _worker.StartSession(duration);
         ApplyDurationToSettings(duration);
@@ -85,6 +92,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         NotifyPresetPreferenceProperties();
         Save();
         RefreshAll();
+        SessionStarted?.Invoke(fromSettingsRestore);
     }
 
     public void StopSession()
@@ -159,7 +167,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     private void ApplyIdleSeconds(int value)
     {
-        var clamped = Math.Clamp(value, 10, 3600);
+        var clamped = SettingLimits.ClampIdleSeconds(value);
         if (_settings.IdleSeconds == clamped)
         {
             SyncIdleSecondsText(clamped);
@@ -197,7 +205,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     private void ApplyMovementPixels(int value)
     {
-        var clamped = Math.Clamp(value, 1, 10);
+        var clamped = SettingLimits.ClampMovementPixels(value);
         if (_settings.MovementPixels == clamped)
         {
             SyncMovementPixelsText(clamped);
@@ -235,7 +243,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
 
     private void ApplySessionDurationHours(int value)
     {
-        var clamped = Math.Clamp(value, 0, 99);
+        var clamped = SettingLimits.ClampSessionDurationHours(value);
         if (_settings.SessionDurationHours == clamped && _settings.SessionDurationMinutes is null)
         {
             SyncSessionDurationHoursText(clamped);
@@ -371,9 +379,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _settings.SessionDurationMinutes = defaults.SessionDurationMinutes;
 
         if (_settings.Enabled)
-            _worker.StartSession(SessionDurationFromSettings());
+            StartSession(SessionDurationFromSettings(), fromSettingsRestore: false);
         else
-            _worker.StopSession();
+            StopSession();
 
         SettingsStore.Save(_settings);
         RevertInvalidNumericFields();

@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.2.0
+
+- Numeric setting ranges shown as muted hints (idle 10–3600 s, movement 1–10 px, run duration 0–99 h)
+- Input guards on numeric fields: digits only, max length, clamp on blur; `SettingLimits` centralizes bounds
+- Numeric steppers on idle, movement, and run duration (spinner buttons, Up/Down keys, and mouse wheel; idle steps by 10 s)
+- Consistent keyboard focus ring (green border) on toggles, numeric steppers, combo box, preset chips, and reset button when tabbing
+- `settings.json` values normalized on load (out-of-range values repaired and saved)
+- Tray balloon when starting a session with **Minimize to tray** on, and when hiding the window to the tray (15 s cooldown between identical balloons)
+- `SessionStarted` event distinguishes user-initiated starts from silent restore at startup (no balloon on restore)
+
 ## v1.1.0
 
 - Tray icon states: disabled, active, and session-completed variants

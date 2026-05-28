@@ -22,7 +22,11 @@ public static class SettingsStore
                 return new AppSettings();
 
             var json = File.ReadAllText(SettingsFilePath);
-            return JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
+            var settings = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions) ?? new AppSettings();
+            if (SettingLimits.Normalize(settings))
+                Save(settings);
+
+            return settings;
         }
         catch
         {

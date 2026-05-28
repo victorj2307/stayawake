@@ -18,6 +18,12 @@ public sealed class TrayIconManager : IDisposable
     private readonly Icon _iconCompleted;
     private readonly Icon? _fallbackIcon;
 
+    private static readonly TimeSpan RunningInTrayBalloonCooldown = TimeSpan.FromSeconds(15);
+    private DateTime _lastRunningInTrayBalloonUtc = DateTime.MinValue;
+
+    private const string RunningInTrayBalloonBody =
+        "Still running in the system tray. Double-click the icon to open settings.";
+
     public TrayIconManager(Window window, StayAwakeWorker worker, MainViewModel viewModel)
     {
         _window = window;
@@ -59,13 +65,31 @@ public sealed class TrayIconManager : IDisposable
     public void ShowSessionCompletedBalloon()
     {
         if (_dispatcher.CheckAccess())
-            ShowBalloonOnUiThread();
+            ShowSessionCompletedBalloonOnUiThread();
         else
-            _dispatcher.BeginInvoke(ShowBalloonOnUiThread);
+            _dispatcher.BeginInvoke(ShowSessionCompletedBalloonOnUiThread);
     }
 
-    private void ShowBalloonOnUiThread() =>
+    public void ShowRunningInTrayBalloon()
+    {
+        if (_dispatcher.CheckAccess())
+            ShowRunningInTrayBalloonOnUiThread();
+        else
+            _dispatcher.BeginInvoke(ShowRunningInTrayBalloonOnUiThread);
+    }
+
+    private void ShowSessionCompletedBalloonOnUiThread() =>
         _notifyIcon.ShowBalloonTip(3000, "StayAwake", "Session completed", ToolTipIcon.Info);
+
+    private void ShowRunningInTrayBalloonOnUiThread()
+    {
+        var now = DateTime.UtcNow;
+        if (now - _lastRunningInTrayBalloonUtc < RunningInTrayBalloonCooldown)
+            return;
+
+        _lastRunningInTrayBalloonUtc = now;
+        _notifyIcon.ShowBalloonTip(3000, "StayAwake", RunningInTrayBalloonBody, ToolTipIcon.Info);
+    }
 
     private void RebuildMenu()
     {

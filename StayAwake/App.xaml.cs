@@ -13,6 +13,8 @@ public partial class App : System.Windows.Application
     private StayAwakeWorker? _worker;
     private TrayIconManager? _tray;
 
+    internal TrayIconManager Tray => _tray ?? throw new InvalidOperationException("Tray not initialized.");
+
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
@@ -34,6 +36,12 @@ public partial class App : System.Windows.Application
         var window = new MainWindow { DataContext = viewModel };
 
         _tray = new TrayIconManager(window, _worker, viewModel);
+
+        viewModel.SessionStarted += fromSettingsRestore =>
+        {
+            if (!fromSettingsRestore && viewModel.MinimizeToTray)
+                _tray.ShowRunningInTrayBalloon();
+        };
 
         _worker.SessionCompleted += () =>
         {

@@ -1,11 +1,12 @@
 ﻿<Window x:Class="StayAwake.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:StayAwake"
         Title="StayAwake"
         Width="680"
         SizeToContent="Height"
         MinHeight="400"
-        MaxHeight="572"
+        MaxHeight="604"
         MinWidth="600"
         ResizeMode="CanMinimize"
         Background="{StaticResource WindowBg}"
@@ -82,32 +83,46 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0" Style="{StaticResource SettingRow}">
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="28"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="&#xE121;" Style="{StaticResource IconGlyph}"/>
-                        <TextBlock Grid.Column="1" Text="Idle time (seconds)" Style="{StaticResource SettingLabel}"/>
-                        <TextBox Grid.Column="2"
-                                 Style="{StaticResource UtilityTextBox}"
-                                 Text="{Binding IdleSecondsText, UpdateSourceTrigger=LostFocus}"
-                                 LostFocus="NumericField_LostFocus"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Idle time (seconds)" Style="{StaticResource SettingLabel}" Margin="12,0,12,0"/>
+                            <TextBlock Text="{Binding IdleSecondsRangeHint}" Style="{StaticResource SettingHint}"/>
+                        </StackPanel>
+                        <local:NumericStepper Grid.Column="2"
+                                              VerticalAlignment="Center"
+                                              MaxLength="4"
+                                              Minimum="{x:Static local:SettingLimits.IdleSecondsMin}"
+                                              Maximum="{x:Static local:SettingLimits.IdleSecondsMax}"
+                                              Step="{x:Static local:SettingLimits.IdleSecondsStep}"
+                                              Text="{Binding IdleSecondsText, UpdateSourceTrigger=LostFocus}"
+                                              LostFocus="NumericField_LostFocus"/>
                     </Grid>
 
-                    <Grid Grid.Row="1" Style="{StaticResource SettingRow}">
+                    <Grid Grid.Row="1" Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="28"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="&#xE962;" Style="{StaticResource IconGlyph}"/>
-                        <TextBlock Grid.Column="1" Text="Movement (pixels)" Style="{StaticResource SettingLabel}"/>
-                        <TextBox Grid.Column="2"
-                                 Style="{StaticResource UtilityTextBox}"
-                                 Text="{Binding MovementPixelsText, UpdateSourceTrigger=LostFocus}"
-                                 LostFocus="NumericField_LostFocus"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Movement (pixels)" Style="{StaticResource SettingLabel}" Margin="12,0,12,0"/>
+                            <TextBlock Text="{Binding MovementPixelsRangeHint}" Style="{StaticResource SettingHint}"/>
+                        </StackPanel>
+                        <local:NumericStepper Grid.Column="2"
+                                              VerticalAlignment="Center"
+                                              MaxLength="2"
+                                              Minimum="{x:Static local:SettingLimits.MovementPixelsMin}"
+                                              Maximum="{x:Static local:SettingLimits.MovementPixelsMax}"
+                                              Step="{x:Static local:SettingLimits.MovementPixelsStep}"
+                                              Text="{Binding MovementPixelsText, UpdateSourceTrigger=LostFocus}"
+                                              LostFocus="NumericField_LostFocus"/>
                     </Grid>
 
                     <Grid Grid.Row="2" Style="{StaticResource SettingRow}">
@@ -139,16 +154,18 @@
                         <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
                             <TextBlock Text="Run duration (hours)" Style="{StaticResource SettingLabel}" Margin="12,0,12,0"/>
                             <TextBlock Text="Presets start immediately. Hours apply when using Enabled."
-                                       FontSize="10"
-                                       Foreground="{StaticResource TextMuted}"
-                                       Margin="12,2,12,0"
-                                       TextWrapping="Wrap"/>
+                                       Style="{StaticResource SettingHint}"/>
+                            <TextBlock Text="{Binding SessionDurationHoursRangeHint}" Style="{StaticResource SettingHint}"/>
                         </StackPanel>
-                        <TextBox Grid.Row="0" Grid.Column="2"
-                                 Style="{StaticResource UtilityTextBox}"
-                                 HorizontalAlignment="Left"
-                                 Text="{Binding SessionDurationHoursText, UpdateSourceTrigger=LostFocus}"
-                                 LostFocus="NumericField_LostFocus"/>
+                        <local:NumericStepper Grid.Row="0" Grid.Column="2"
+                                              HorizontalAlignment="Left"
+                                              VerticalAlignment="Center"
+                                              MaxLength="2"
+                                              Minimum="{x:Static local:SettingLimits.SessionDurationHoursMin}"
+                                              Maximum="{x:Static local:SettingLimits.SessionDurationHoursMax}"
+                                              Step="{x:Static local:SettingLimits.SessionDurationHoursStep}"
+                                              Text="{Binding SessionDurationHoursText, UpdateSourceTrigger=LostFocus}"
+                                              LostFocus="NumericField_LostFocus"/>
                         <Grid Grid.Row="1"
                               Grid.Column="2"
                               Width="140"
@@ -175,7 +192,6 @@
                                             <DataTrigger Binding="{Binding IsPreset30mPreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                                 <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
-                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -193,7 +209,6 @@
                                             <DataTrigger Binding="{Binding IsPreset1hPreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                                 <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
-                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -211,7 +226,6 @@
                                             <DataTrigger Binding="{Binding IsPreset3hPreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                                 <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
-                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -230,7 +244,6 @@
                                             <DataTrigger Binding="{Binding IsPresetIndefinitePreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                                 <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
-                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>

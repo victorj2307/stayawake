@@ -55,6 +55,13 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
+        <Style x:Key="SettingHint" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Foreground" Value="{StaticResource TextMuted}"/>
+            <Setter Property="Margin" Value="12,2,12,0"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
         <Style x:Key="StatusRow" TargetType="Grid">
             <Setter Property="Margin" Value="0,0,0,6"/>
             <Setter Property="MinHeight" Value="22"/>
@@ -106,6 +113,7 @@
 
         <!-- Toggle switch (small, ~22px) -->
         <Style x:Key="UtilityToggle" TargetType="ToggleButton">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Width" Value="44"/>
             <Setter Property="Height" Value="22"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -126,6 +134,9 @@
                                      VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                            </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Track" Property="Background" Value="{StaticResource AccentGreen}"/>
                                 <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
@@ -143,6 +154,7 @@
 
         <!-- Toggle switch (enable row) -->
         <Style x:Key="UtilityToggleLarge" TargetType="ToggleButton">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Width" Value="52"/>
             <Setter Property="Height" Value="28"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -163,6 +175,9 @@
                                      VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                            </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Track" Property="Background" Value="{StaticResource AccentGreen}"/>
                                 <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
@@ -180,6 +195,7 @@
 
         <!-- TextBox -->
         <Style x:Key="UtilityTextBox" TargetType="TextBox">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="Background" Value="{StaticResource InputBg}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
@@ -227,8 +243,75 @@
             </Style.Triggers>
         </Style>
 
+        <!-- Numeric stepper inner text (borderless inside composite control) -->
+        <Style x:Key="UtilityNumericStepperTextBox" TargetType="TextBox">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="CaretBrush" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="Center"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Hidden"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Numeric stepper up/down buttons -->
+        <Style x:Key="UtilityStepperButton" TargetType="RepeatButton">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="Background" Value="{StaticResource InputBg}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#333333"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#3A3A3A"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Session duration preset chips (preference hint only, not active-state) -->
         <Style x:Key="UtilityPresetChip" TargetType="Button">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
@@ -251,6 +334,9 @@
                                               VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
                             </Trigger>
@@ -268,6 +354,7 @@
 
         <!-- ComboBox -->
         <Style x:Key="UtilityComboBox" TargetType="ComboBox">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="Background" Value="{StaticResource InputBg}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
@@ -336,7 +423,13 @@
                             </Popup>
                         </Grid>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                            </Trigger>
                             <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
                                 <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
@@ -349,6 +442,7 @@
         </Style>
 
         <Style x:Key="UtilityComboBoxItem" TargetType="ComboBoxItem">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Padding" Value="10,8"/>
@@ -378,6 +472,7 @@
 
         <!-- Footer: subtle secondary action -->
         <Style x:Key="FooterResetButton" TargetType="Button">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
             <Setter Property="Height" Value="26"/>
             <Setter Property="MinHeight" Value="26"/>
             <Setter Property="Padding" Value="10,0"/>
@@ -403,6 +498,9 @@
                                               RecognizesAccessKey="True"/>
                         </Border>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{StaticResource InputBg}"/>
                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>

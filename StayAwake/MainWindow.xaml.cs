@@ -15,7 +15,7 @@ public partial class MainWindow : Window
         if (DataContext is MainViewModel vm && vm.MinimizeToTray)
         {
             e.Cancel = true;
-            Hide();
+            HideToTray();
             return;
         }
 
@@ -30,13 +30,27 @@ public partial class MainWindow : Window
             && DataContext is MainViewModel vm
             && vm.MinimizeToTray)
         {
-            Hide();
+            HideToTray();
+        }
+    }
+
+    private void HideToTray()
+    {
+        Hide();
+
+        if (DataContext is MainViewModel vm
+            && vm.MinimizeToTray
+            && System.Windows.Application.Current is App app)
+        {
+            app.Tray.ShowRunningInTrayBalloon();
         }
     }
 
     private void NumericField_LostFocus(object sender, RoutedEventArgs e)
     {
-        if (DataContext is MainViewModel vm)
-            vm.RevertInvalidNumericFields();
+        if (DataContext is not MainViewModel vm)
+            return;
+
+        Dispatcher.BeginInvoke(() => vm.RevertInvalidNumericFields());
     }
 }

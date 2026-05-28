@@ -23,7 +23,8 @@ The architecture stays flat on purpose: manual wiring in `App`, one background w
 - **Idle detection** via Windows `GetLastInputInfo`
 - **Invisible mouse jiggle** — `SendInput` moves the cursor slightly and returns it (configurable pixels and direction)
 - **Keep-awake** — `SetThreadExecutionState` prevents display sleep and system idle while a session is active
-- **Configurable idle threshold** — how long to wait after your last real input before nudging (10–3600 seconds)
+- **Configurable idle threshold** — how long to wait after your last real input before nudging (10–3600 seconds; range shown in UI)
+- **Numeric steppers** — idle, movement, and run duration use spinner buttons, Up/Down keys, and mouse wheel (idle steps by 10 seconds)
 - **Session duration** — run for N hours or unlimited (`0` hours); auto-disable when time is up
 - **Quick presets** — 30m / 1h / 3h / indefinite in the tray menu and main window
 - **Tray icon states** — disabled, active, and session-completed variants at a glance
@@ -153,7 +154,7 @@ See [docs/ARCHITECTURE.md §16](docs/ARCHITECTURE.md#16-release-automation) for 
 ### Enable a session (main window)
 
 1. Set **Run duration (hours)** — `0` = unlimited until you stop the session.
-2. Configure **Idle time**, **Movement**, and **Movement direction** as needed.
+2. Configure **Idle time**, **Movement**, and **Movement direction** as needed (type a value, use the ▲/▼ buttons, arrow keys, mouse wheel, or **Tab** to move between controls).
 3. Toggle **Enabled** on. Settings lock while active; turn off to edit again.
 
 ### Tray menu
@@ -175,6 +176,8 @@ When a timed session ends, a tray balloon notifies you and status shows **Sessio
 ### Minimize to tray
 
 With **Minimize to tray** enabled, closing or minimizing the window hides it; the worker and tray icon keep running until you choose **Exit** from the tray.
+
+When you start a session with minimize-to-tray on, or when you hide the window to the tray, a short tray balloon reminds you that StayAwake is still running in the notification area (double-click the tray icon to open settings).
 
 ---
 
@@ -218,6 +221,8 @@ For state diagrams, worker loop pseudocode, Win32 details, and threading notes, 
 - **Dark theme** — low-contrast grays and green accent; Segoe MDL2 icons for settings rows.
 - **Status sidebar** — state, remaining time (or session ended date/time when completed), last movement—no log viewer.
 - **Session-oriented workflow** — enable = start a session; configure duration and idle rules before or between sessions.
+- **Bounded numeric inputs** — muted range hints, clamp on blur, and `NumericStepper` controls for the three numeric settings.
+- **Keyboard-friendly** — Tab through all controls; focused fields show a green border (matches the dark theme, no dashed system focus rectangle).
 
 ---
 
@@ -242,21 +247,26 @@ For state diagrams, worker loop pseudocode, Win32 details, and threading notes, 
 stayawake/
 ├── LICENSE
 ├── ATTRIBUTIONS.md
+├── CHANGELOG.md
 ├── README.md
 ├── scripts/
 │   └── release.ps1
 ├── docs/
 │   ├── ARCHITECTURE.md
+│   ├── BRANCHING.md
+│   ├── POST_V1_ROADMAP.md
 │   └── screenshots/
 ├── StayAwake.slnx
 └── StayAwake/
     ├── App.xaml / App.xaml.cs
     ├── MainWindow.xaml / MainWindow.xaml.cs
     ├── MainViewModel.cs
+    ├── NumericStepper.xaml / NumericStepper.xaml.cs
     ├── StayAwakeWorker.cs
     ├── TrayIconManager.cs
     ├── NativeMethods.cs
     ├── AppSettings.cs
+    ├── SettingLimits.cs
     ├── AppStatus.cs
     ├── MovementMode.cs
     ├── MovementModeJsonConverter.cs
@@ -268,7 +278,8 @@ stayawake/
     └── scripts/
         ├── generate-icon.py
         ├── capture-screenshots.ps1
-        └── generate-tray-menu-screenshot.py
+        ├── generate-tray-menu-screenshot.py
+        └── ScreenshotTool/
 ```
 
 ---
@@ -292,12 +303,14 @@ Created beside `StayAwake.exe` on first run.
 | Field | Type | Description |
 |-------|------|-------------|
 | `enabled` | bool | Whether a session is active (persisted across restarts) |
-| `movementPixels` | int | Jiggle distance (1–10) |
-| `idleSeconds` | int | Seconds of real idle before nudging (10–3600) |
+| `movementPixels` | int | Jiggle distance (1–10; UI steps by 1) |
+| `idleSeconds` | int | Seconds of real idle before nudging (10–3600; UI steps by 10) |
 | `minimizeToTray` | bool | Hide window on close/minimize instead of exiting |
 | `movementMode` | enum | `Horizontal`, `Vertical`, or `Random` (unknown values default to `Horizontal`) |
-| `sessionDurationHours` | int | Default duration when enabling from UI (`0` = unlimited) |
+| `sessionDurationHours` | int | Default duration when enabling from UI (`0` = unlimited; UI steps by 1) |
 | `sessionDurationMinutes` | int? | When set (e.g. `30`), overrides hours for the default duration |
+
+Out-of-range values in the file are clamped to valid bounds on load. In the UI, each numeric field shows its allowed range and supports typing, spinner buttons, Up/Down keys, and mouse wheel.
 
 Tray and UI presets start sessions immediately and update the saved duration preference (`sessionDurationHours` and/or `sessionDurationMinutes`).
 
@@ -308,7 +321,7 @@ Tray and UI presets start sessions immediately and update the saved duration pre
 - **Icon:** State-specific embedded ICOs (`app-tray-disabled`, `app-tray-active`, `app-tray-completed`; fallback: `app.ico`, then system default).
 - **Tooltip:** `StayAwake — Active`, `Active (1h 12m)`, `Active (no limit)`, `Disabled`, or `Session completed` (63-char limit).
 - **Menu:** Rebuilt when opened; start presets disabled while a session is active.
-- **Balloon:** "Session completed" when a timed session expires.
+- **Balloons:** "Session completed" when a timed session expires; "Still running in the system tray…" when you enable a session with minimize-to-tray or hide the window to the tray (not on every app restart if a session was already enabled).
 
 ---
 
