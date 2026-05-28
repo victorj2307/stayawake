@@ -6,7 +6,8 @@ namespace StayAwake;
 public partial class App : System.Windows.Application
 {
     private const string SingleInstanceMutexName = "StayAwake.SingleInstance";
-    private static Mutex? _singleInstanceMutex;
+    private Mutex? _singleInstanceMutex;
+    private bool _ownsSingleInstanceMutex;
 
     private AppSettings? _settings;
     private StayAwakeWorker? _worker;
@@ -16,7 +17,7 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(e);
 
-        if (!TryAcquireSingleInstance())
+        if (!TryAcquireSingleInstanceMutex())
         {
             System.Windows.MessageBox.Show(
                 "StayAwake is already running.",
@@ -59,15 +60,33 @@ public partial class App : System.Windows.Application
 
         _worker?.Dispose();
         _tray?.Dispose();
-        _singleInstanceMutex?.ReleaseMutex();
-        _singleInstanceMutex?.Dispose();
+        ReleaseSingleInstanceMutex();
 
         base.OnExit(e);
     }
 
-    private static bool TryAcquireSingleInstance()
+    private bool TryAcquireSingleInstanceMutex()
     {
-        _singleInstanceMutex = new Mutex(true, SingleInstanceMutexName, out var createdNew);
-        return createdNew;
+        var mutex = new Mutex(true, SingleInstanceMutexName, out var createdNew);
+        if (!createdNew)
+        {
+            mutex.Dispose();
+            return false;
+        }
+
+        _singleInstanceMutex = mutex;
+        _ownsSingleInstanceMutex = true;
+        return true;
+    }
+
+    private void ReleaseSingleInstanceMutex()
+    {
+        if (!_ownsSingleInstanceMutex || _singleInstanceMutex is null)
+            return;
+
+        _singleInstanceMutex.ReleaseMutex();
+        _singleInstanceMutex.Dispose();
+        _singleInstanceMutex = null;
+        _ownsSingleInstanceMutex = false;
     }
 }

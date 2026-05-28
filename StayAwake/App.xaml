@@ -233,8 +233,8 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="6,2"/>
-            <Setter Property="MinWidth" Value="32"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="MinWidth" Value="30"/>
             <Setter Property="Height" Value="24"/>
             <Setter Property="FontSize" Value="11"/>
             <Setter Property="Cursor" Value="Hand"/>

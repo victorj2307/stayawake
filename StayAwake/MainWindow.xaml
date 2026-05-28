@@ -146,17 +146,31 @@
                         </StackPanel>
                         <TextBox Grid.Row="0" Grid.Column="2"
                                  Style="{StaticResource UtilityTextBox}"
+                                 HorizontalAlignment="Left"
                                  Text="{Binding SessionDurationHoursText, UpdateSourceTrigger=LostFocus}"
                                  LostFocus="NumericField_LostFocus"/>
-                        <StackPanel Grid.Row="1"
-                                    Grid.Column="2"
-                                    Orientation="Horizontal"
-                                    HorizontalAlignment="Right"
-                                    Margin="0,6,0,0">
-                            <Button Content="30m" Margin="0,0,4,0"
-                                    Command="{Binding StartPreset30mCommand}">
+                        <Grid Grid.Row="1"
+                              Grid.Column="2"
+                              Width="140"
+                              Margin="0,6,0,0"
+                              HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="32"/>
+                                <ColumnDefinition Width="4"/>
+                                <ColumnDefinition Width="32"/>
+                                <ColumnDefinition Width="4"/>
+                                <ColumnDefinition Width="32"/>
+                                <ColumnDefinition Width="4"/>
+                                <ColumnDefinition Width="32"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    Content="30m"
+                                    Command="{Binding StartPreset30mCommand}"
+                                    HorizontalAlignment="Stretch">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource UtilityPresetChip}">
+                                        <Setter Property="MinWidth" Value="0"/>
+                                        <Setter Property="Padding" Value="0,2"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsPreset30mPreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
@@ -167,10 +181,14 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                            <Button Content="1h" Margin="0,0,4,0"
-                                    Command="{Binding StartPreset1hCommand}">
+                            <Button Grid.Column="2"
+                                    Content="1h"
+                                    Command="{Binding StartPreset1hCommand}"
+                                    HorizontalAlignment="Stretch">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource UtilityPresetChip}">
+                                        <Setter Property="MinWidth" Value="0"/>
+                                        <Setter Property="Padding" Value="0,2"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsPreset1hPreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
@@ -181,10 +199,14 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                            <Button Content="3h" Margin="0,0,4,0"
-                                    Command="{Binding StartPreset3hCommand}">
+                            <Button Grid.Column="4"
+                                    Content="3h"
+                                    Command="{Binding StartPreset3hCommand}"
+                                    HorizontalAlignment="Stretch">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource UtilityPresetChip}">
+                                        <Setter Property="MinWidth" Value="0"/>
+                                        <Setter Property="Padding" Value="0,2"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsPreset3hPreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
@@ -195,11 +217,15 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                            <Button Content="&#x221E;"
+                            <Button Grid.Column="6"
+                                    Content="&#x221E;"
                                     Command="{Binding StartPresetIndefiniteCommand}"
-                                    ToolTip="Indefinite">
+                                    ToolTip="Indefinite"
+                                    HorizontalAlignment="Stretch">
                                 <Button.Style>
                                     <Style TargetType="Button" BasedOn="{StaticResource UtilityPresetChip}">
+                                        <Setter Property="MinWidth" Value="0"/>
+                                        <Setter Property="Padding" Value="0,2"/>
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding IsPresetIndefinitePreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
@@ -210,7 +236,7 @@
                                     </Style>
                                 </Button.Style>
                             </Button>
-                        </StackPanel>
+                        </Grid>
                     </Grid>
 
                     <Grid Grid.Row="4" Style="{StaticResource SettingRowLast}">
@@ -221,11 +247,12 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="&#xE74A;" Style="{StaticResource IconGlyph}"/>
                         <TextBlock Grid.Column="1" Text="Minimize to tray" Style="{StaticResource SettingLabel}"/>
-                        <ToggleButton Grid.Column="2"
-                                      Style="{StaticResource UtilityToggle}"
-                                      IsChecked="{Binding MinimizeToTray}"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Center"/>
+                        <Grid Grid.Column="2" Width="140" HorizontalAlignment="Left">
+                            <ToggleButton Style="{StaticResource UtilityToggle}"
+                                          IsChecked="{Binding MinimizeToTray}"
+                                          HorizontalAlignment="Right"
+                                          VerticalAlignment="Center"/>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Grid>
