@@ -40,6 +40,42 @@ function Assert-Command {
     }
 }
 
+$script:GhExe = $null
+
+function Resolve-GhExe {
+    $cmd = Get-Command gh -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+
+    foreach ($path in @(
+            "$env:ProgramFiles\GitHub CLI\gh.exe"
+            ${env:ProgramFiles(x86)} + '\GitHub CLI\gh.exe'
+            "$env:LOCALAPPDATA\Programs\GitHub CLI\gh.exe"
+        )) {
+        if ($path -and (Test-Path $path)) { return $path }
+    }
+
+    # Pick up PATH changes from a recent install without restarting the terminal.
+    $env:Path = [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';' +
+        [Environment]::GetEnvironmentVariable('Path', 'User')
+    $cmd = Get-Command gh -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+
+    throw @"
+GitHub CLI (gh) not found. Install from https://cli.github.com/ then either:
+  - Open a new terminal and run: gh auth login
+  - Or ensure gh.exe is on PATH
+"@
+}
+
+function Invoke-Gh {
+    param([string[]]$GhArgs)
+    if (-not $script:GhExe) { $script:GhExe = Resolve-GhExe }
+    & $script:GhExe @GhArgs
+    if ($LASTEXITCODE -ne 0) {
+        throw "gh $($GhArgs -join ' ') failed with exit code $LASTEXITCODE"
+    }
+}
+
 function Get-ProjectVersion {
     [xml]$proj = Get-Content $csproj
     foreach ($pg in $proj.Project.PropertyGroup) {
@@ -80,9 +116,10 @@ try {
     Assert-Command dotnet
     Assert-Command git
     if (-not $SkipPush) {
-        Assert-Command gh
+        $script:GhExe = Resolve-GhExe
+        Write-Host "Using GitHub CLI: $script:GhExe"
         if (-not $DryRun) {
-            & gh auth status
+            & $script:GhExe auth status
             if ($LASTEXITCODE -ne 0) {
                 throw 'gh is not authenticated. Run: gh auth login'
             }
@@ -192,7 +229,7 @@ try {
             if ($LASTEXITCODE -eq 0) { $hasPriorTag = $true }
 
             if ($hasPriorTag) {
-                & gh release create $tag $zipPath --title "StayAwake $tag" --generate-notes
+                Invoke-Gh @('release', 'create', $tag, $zipPath, '--title', "StayAwake $tag", '--generate-notes')
             } else {
                 @"
 StayAwake **$tag** — Windows x64 portable build.
@@ -205,10 +242,7 @@ StayAwake **$tag** — Windows x64 portable build.
 - Windows 10 or later
 - No administrator rights required
 "@ | Set-Content -Path $notesFile -Encoding utf8
-                & gh release create $tag $zipPath --title "StayAwake $tag" --notes-file $notesFile
-            }
-            if ($LASTEXITCODE -ne 0) {
-                throw 'gh release create failed'
+                Invoke-Gh @('release', 'create', $tag, $zipPath, '--title', "StayAwake $tag", '--notes-file', $notesFile)
             }
         } finally {
             Remove-Item $notesFile -Force -ErrorAction SilentlyContinue
@@ -217,7 +251,7 @@ StayAwake **$tag** — Windows x64 portable build.
 
     Write-Host "Release $tag complete."
     if (-not $DryRun) {
-        & gh release view $tag --web 2>$null
+        & $script:GhExe release view $tag --web 2>$null
     }
 }
 finally {
