@@ -61,10 +61,39 @@ No administrator rights required to run.
 ## Quick start
 
 1. Build or download `StayAwake.exe` (see [Publish](#publish-single-portable-exe) below).
-2. Run it. On first launch, `settings.json` is created beside the EXE.
+2. Run it. On first launch, `settings.json` is created beside the EXE. If Windows blocks the app, see [Windows Defender and SmartScreen](#windows-defender-and-smartscreen).
 3. Turn **Enabled** on and set **Idle time** (e.g. `60` seconds).
 4. Leave the PC idle — after the threshold, the mouse nudges once per idle period (cursor stays in place).
 5. Optional: enable **Minimize to tray** and close the window; the app keeps running from the tray icon.
+
+---
+
+## Windows Defender and SmartScreen
+
+StayAwake is a portable, **unsigned** executable. Downloads from a browser or GitHub carry a Mark of the Web flag, and the app uses Win32 `SendInput` (synthetic mouse movement) and keep-awake APIs—behavior similar to other mouse-jiggler utilities. Windows may warn or block on first run even though the app does not require administrator rights and is [open source](#project-structure). You can also [build from source](#build) if you prefer.
+
+### SmartScreen: "Windows protected your PC"
+
+Click **More info**, then **Run anyway**. An unknown publisher is expected until the project adopts code signing.
+
+### Unblock the downloaded file
+
+Right-click `StayAwake.exe` → **Properties** → check **Unblock** → **Apply**, or run:
+
+```powershell
+Unblock-File .\StayAwake.exe
+```
+
+### If Microsoft Defender quarantines or blocks the app
+
+1. Open **Windows Security** → **Virus & threat protection** → **Manage settings** → **Exclusions**.
+2. Add an exclusion for the **folder** where you keep `StayAwake.exe` (or the file itself). Only exclude paths you trust.
+
+If you believe the detection is a false positive, submit the file via [Microsoft's malware analysis portal](https://www.microsoft.com/en-us/wdsi/filesubmission).
+
+Building locally (see [Build](#build)) avoids browser download flags, but Defender may still prompt when a session starts because of input-simulation behavior.
+
+**Note for maintainers:** Authenticode signing would reduce SmartScreen friction on release builds; it is not implemented today.
 
 ---
 
