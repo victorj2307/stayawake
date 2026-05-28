@@ -5,12 +5,16 @@ See the [README](../../README.md) for build and publish instructions. Third-part
 | File | Purpose |
 |------|---------|
 | `app-icon-source.png` | Master artwork (edit this) |
-| `app.ico` | Windows EXE icon (`ApplicationIcon`), embedded WPF resource (tray) |
+| `app.ico` | EXE icon (`ApplicationIcon`), neutral/disabled appearance |
+| `app-tray-disabled.ico` | Tray when disabled |
+| `app-tray-active.ico` | Tray when session active |
+| `app-tray-completed.ico` | Tray when timed session completed |
 | `app-header.png` | In-app header via pack URI (embedded WPF resource) |
 
-Regenerate `app.ico` and `app-header.png` after changing the source:
+Regenerate all icons after changing the source:
 
 ```powershell
+cd StayAwake
 python scripts/generate-icon.py
 ```
 

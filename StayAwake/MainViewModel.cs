@@ -31,19 +31,22 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _worker.SessionCompleted += OnSessionCompleted;
 
         ResetSettingsCommand = new RelayCommand(ResetToDefaults, () => CanEditSettings);
+        StartPreset30mCommand = new RelayCommand(() => StartSession(TimeSpan.FromMinutes(30)), () => CanEditSettings);
+        StartPreset1hCommand = new RelayCommand(() => StartSession(TimeSpan.FromHours(1)), () => CanEditSettings);
+        StartPreset3hCommand = new RelayCommand(() => StartSession(TimeSpan.FromHours(3)), () => CanEditSettings);
+        StartPresetIndefiniteCommand = new RelayCommand(() => StartSession(null), () => CanEditSettings);
 
         if (_settings.Enabled)
-        {
-            var duration = _settings.SessionDurationHours > 0
-                ? TimeSpan.FromHours(_settings.SessionDurationHours)
-                : (TimeSpan?)null;
-            _worker.StartSession(duration);
-        }
+            _worker.StartSession(SessionDurationFromSettings());
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ICommand ResetSettingsCommand { get; }
+    public ICommand StartPreset30mCommand { get; }
+    public ICommand StartPreset1hCommand { get; }
+    public ICommand StartPreset3hCommand { get; }
+    public ICommand StartPresetIndefiniteCommand { get; }
 
     public string AppVersion
     {
@@ -74,15 +77,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
     public void StartSession(TimeSpan? duration)
     {
         _worker.StartSession(duration);
-
-        if (duration is { TotalHours: >= 1 } d)
-            _settings.SessionDurationHours = (int)d.TotalHours;
-        else if (duration is null)
-            _settings.SessionDurationHours = 0;
+        ApplyDurationToSettings(duration);
 
         OnPropertyChanged(nameof(Enabled));
         OnPropertyChanged(nameof(SessionDurationHours));
         SyncSessionDurationHoursText(_settings.SessionDurationHours);
+        NotifyPresetPreferenceProperties();
         Save();
         RefreshAll();
     }
@@ -95,10 +95,49 @@ public sealed class MainViewModel : INotifyPropertyChanged
         RefreshAll();
     }
 
-    private TimeSpan? SessionDurationFromSettings() =>
-        _settings.SessionDurationHours > 0
+    private static void ApplyDurationToSettings(TimeSpan? duration, AppSettings settings)
+    {
+        if (duration is null)
+        {
+            settings.SessionDurationHours = 0;
+            settings.SessionDurationMinutes = null;
+            return;
+        }
+
+        if (duration.Value.TotalHours >= 1)
+        {
+            settings.SessionDurationHours = (int)duration.Value.TotalHours;
+            settings.SessionDurationMinutes = null;
+            return;
+        }
+
+        settings.SessionDurationMinutes = (int)duration.Value.TotalMinutes;
+    }
+
+    private void ApplyDurationToSettings(TimeSpan? duration) =>
+        ApplyDurationToSettings(duration, _settings);
+
+    private TimeSpan? SessionDurationFromSettings()
+    {
+        if (_settings.SessionDurationMinutes is { } minutes and > 0)
+            return TimeSpan.FromMinutes(minutes);
+
+        return _settings.SessionDurationHours > 0
             ? TimeSpan.FromHours(_settings.SessionDurationHours)
             : null;
+    }
+
+    public bool IsPreset30mPreferred =>
+        _settings.SessionDurationMinutes == 30;
+
+    public bool IsPreset1hPreferred =>
+        _settings.SessionDurationMinutes is null && _settings.SessionDurationHours == 1;
+
+    public bool IsPreset3hPreferred =>
+        _settings.SessionDurationMinutes is null && _settings.SessionDurationHours == 3;
+
+    public bool IsPresetIndefinitePreferred =>
+        _settings.SessionDurationMinutes is null && _settings.SessionDurationHours == 0;
 
     public string IdleSecondsText
     {
@@ -197,17 +236,19 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private void ApplySessionDurationHours(int value)
     {
         var clamped = Math.Clamp(value, 0, 99);
-        if (_settings.SessionDurationHours == clamped)
+        if (_settings.SessionDurationHours == clamped && _settings.SessionDurationMinutes is null)
         {
             SyncSessionDurationHoursText(clamped);
             return;
         }
 
         _settings.SessionDurationHours = clamped;
+        _settings.SessionDurationMinutes = null;
         SyncSessionDurationHoursText(clamped);
         OnPropertyChanged(nameof(SessionDurationHours));
         OnPropertyChanged(nameof(RemainingTimeValue));
         OnPropertyChanged(nameof(RemainingDisplayText));
+        NotifyPresetPreferenceProperties();
         Save();
     }
 
@@ -308,6 +349,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(Enabled));
         OnPropertyChanged(nameof(MovementMode));
         OnPropertyChanged(nameof(MinimizeToTray));
+        NotifyPresetPreferenceProperties();
     }
 
     public void RevertInvalidNumericFields()
@@ -326,6 +368,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         _settings.MinimizeToTray = defaults.MinimizeToTray;
         _settings.MovementMode = defaults.MovementMode;
         _settings.SessionDurationHours = defaults.SessionDurationHours;
+        _settings.SessionDurationMinutes = defaults.SessionDurationMinutes;
 
         if (_settings.Enabled)
             _worker.StartSession(SessionDurationFromSettings());
@@ -355,6 +398,14 @@ public sealed class MainViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(LastMovementValue));
         OnPropertyChanged(nameof(CanEditSettings));
         CommandManager.InvalidateRequerySuggested();
+    }
+
+    private void NotifyPresetPreferenceProperties()
+    {
+        OnPropertyChanged(nameof(IsPreset30mPreferred));
+        OnPropertyChanged(nameof(IsPreset1hPreferred));
+        OnPropertyChanged(nameof(IsPreset3hPreferred));
+        OnPropertyChanged(nameof(IsPresetIndefinitePreferred));
     }
 
     private void Save() => SettingsStore.Save(_settings);

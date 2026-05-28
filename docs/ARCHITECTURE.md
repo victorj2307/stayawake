@@ -371,6 +371,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 | `MinimizeToTray` | `false` |
 | `MovementMode` | `Horizontal` (enum) |
 | `SessionDurationHours` | `0` (unlimited when starting from UI) |
+| `SessionDurationMinutes` | `null` (when set, e.g. `30`, overrides hours for default duration) |
 
 ### When settings are saved
 
@@ -396,7 +397,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 |------|---------|
 | Header | App icon + title + tagline |
 | Left card | Enabled toggle |
-| Left grid | Idle seconds, movement pixels, direction combo, run duration (hours), minimize-to-tray |
+| Left grid | Idle seconds, movement pixels, direction combo, run duration (hours) + quick presets (30m/1h/3h/∞), minimize-to-tray |
 | Right card | Status: state pill + dot, remaining or session ended (label switches), last movement |
 | Footer | Version string, Reset settings button |
 
@@ -437,7 +438,17 @@ Tray and worker continue until Exit from tray menu or close without minimize-to-
 
 ### Icon
 
-Loads `Assets/app.ico` from the WPF pack URI (`pack://application:,,,/Assets/app.ico`). Falls back to `SystemIcons.Application` if the resource is missing.
+Loads state-specific tray ICOs from embedded WPF resources:
+
+| `AppStatus` | Resource |
+|-------------|----------|
+| `Disabled` | `Assets/app-tray-disabled.ico` |
+| `Active` | `Assets/app-tray-active.ico` |
+| `SessionCompleted` | `Assets/app-tray-completed.ico` |
+
+`UpdateTrayAppearance()` runs on `StatusChanged` (icon + tooltip). Missing variant files fall back to `Assets/app.ico`, then `SystemIcons.Application` if that is also missing.
+
+`Assets/app.ico` is the neutral/disabled EXE icon (`ApplicationIcon`), not the active-state glyph.
 
 ### Interactions
 
@@ -454,7 +465,7 @@ Loads `Assets/app.ico` from the WPF pack URI (`pack://application:,,,/Assets/app
 4. Stop session (enabled only while Active)
 5. Exit → `Application.Current.Shutdown()`
 
-Tray presets call `_viewModel.StartSession(TimeSpan?)` directly—they do **not** update `SessionDurationHours` in settings.
+Tray and UI presets call `_viewModel.StartSession(TimeSpan?)`, which updates `SessionDurationHours` and/or `SessionDurationMinutes` in settings (30m → minutes; 1h/3h → hours; indefinite → hours `0`, minutes cleared).
 
 ### Tooltip
 
@@ -486,7 +497,7 @@ On session expiry: 3-second info balloon — "Session completed".
 
 | Event | Source | Subscribers | Marshaling |
 |-------|--------|-------------|------------|
-| `StatusChanged` | Worker when runtime snapshot changes | `MainViewModel`, `TrayIconManager` | VM: `NotifyStatusProperties` (or `Enabled` + status on `SessionCompleted`); tray: tooltip on dispatcher |
+| `StatusChanged` | Worker when runtime snapshot changes | `MainViewModel`, `TrayIconManager` | VM: `NotifyStatusProperties` (or `Enabled` + status on `SessionCompleted`); tray: icon + tooltip on dispatcher |
 | `SessionCompleted` | Worker (on expiry) | `MainViewModel`, `App` | VM: `Enabled` + status properties; App: save + balloon only |
 
 ### Worker vs ViewModel on `StatusChanged`
@@ -524,7 +535,7 @@ On session expiry: 3-second info balloon — "Session completed".
 ### Intentional design notes
 
 - Single shared `AppSettings` instance; **worker** owns session lifecycle and writes `Enabled` during start/stop/complete.
-- Tray **30 minutes** preset does not update `sessionDurationHours` (whole-hour and indefinite presets do sync). The status sidebar **remaining** time always reflects the active session.
+- Preset chip highlight in the main window reflects **saved duration preference** only, not runtime `AppStatus` (active state remains tray icon, status sidebar, and **Enabled** toggle).
 
 ### Product limitations (by design)
 
@@ -543,8 +554,15 @@ Prioritized for the **minimalist utility** philosophy. See README roadmap for a 
 
 | Idea | Rationale |
 |------|-----------|
-| Tray icon visual state (active / disabled / completed) | Faster recognition without opening menu |
-| UI session presets (30m / 1h / 3h) matching tray | One mental model for duration |
+| Custom vector icon replacing Flaticon source | Fully owned branding; schedule for v1.2+ |
+| README / social screenshot refresh after icon pass | Keeps marketing aligned with UI |
+
+### Shipped in v1.1.0
+
+- Tray icon visual state (active / disabled / completed)
+- UI session presets (30m / 1h / 3h / ∞) matching tray
+- `SessionDurationMinutes` for 30m preference persistence
+- `main` + `develop` branching ([BRANCHING.md](BRANCHING.md))
 
 ### Consider carefully
 
@@ -579,7 +597,7 @@ Do not add: cloud sync, accounts, telemetry, plugins, schedulers, enterprise das
 | `TrayIconManager.cs` | System tray icon and menu |
 | `RelayCommand.cs` | `ICommand` for reset button |
 | `StayAwake.csproj` | Project config, `ApplicationIcon`, embedded WPF resources |
-| `Assets/*` | Icons; see `Assets/ICON.md` for regeneration |
+| `Assets/*` | Icons (EXE + tray states + header); see `Assets/ICON.md` |
 | `scripts/generate-icon.py` | Regenerate `.ico` and header PNG from source |
 | `scripts/capture-screenshots.ps1` | Automated window captures for README |
 | `scripts/release.ps1` | Publish, zip, tag, and GitHub Release (see README) |
@@ -600,8 +618,8 @@ Releases are driven by [`scripts/release.ps1`](../scripts/release.ps1) on Window
 5. Commit csproj only if the version changed; create annotated tag `v{version}`; push branch and tag to `origin`.
 6. `gh release create` with the zip attached (generated release notes when a prior tag exists).
 
-**Related implementation details:** tray icon loads from `pack://application:,,,/Assets/app.ico` ([§10](#10-tray-integration)); publish output should not include an `Assets\` folder beside the EXE.
+**Related implementation details:** tray icons are embedded WPF resources ([§10](#10-tray-integration)); publish output should not include an `Assets\` folder beside the EXE. Merge `develop` → `main` before running the script ([BRANCHING.md](BRANCHING.md)).
 
 ---
 
-*Last updated: release automation and embedded tray icon — .NET 8 / single-project WPF utility.*
+*Last updated: v1.1.0 — tray icon states, UI presets, develop branch — .NET 8 / single-project WPF utility.*

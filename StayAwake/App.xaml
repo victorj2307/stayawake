@@ -20,6 +20,9 @@
         <SolidColorBrush x:Key="ToggleTrackOff" Color="#2E2E2E"/>
         <SolidColorBrush x:Key="ToggleTrackBorder" Color="#404040"/>
         <SolidColorBrush x:Key="ToggleThumb" Color="#F0F0F0"/>
+        <SolidColorBrush x:Key="PresetBorderPreferred" Color="#4A4A4A"/>
+        <SolidColorBrush x:Key="PresetBgPreferred" Color="#2A2A2A"/>
+        <SolidColorBrush x:Key="PresetAccentHint" Color="#5A6A72"/>
 
         <!-- Override system highlight colors for ComboBox dropdown -->
         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#1A3D2E"/>
@@ -222,6 +225,45 @@
                     <Setter Property="CaretBrush" Value="Transparent"/>
                 </Trigger>
             </Style.Triggers>
+        </Style>
+
+        <!-- Session duration preset chips (preference hint only, not active-state) -->
+        <Style x:Key="UtilityPresetChip" TargetType="Button">
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="MinWidth" Value="32"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource InputBg}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- ComboBox -->

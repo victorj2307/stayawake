@@ -5,7 +5,7 @@
         Width="680"
         SizeToContent="Height"
         MinHeight="400"
-        MaxHeight="560"
+        MaxHeight="572"
         MinWidth="600"
         ResizeMode="CanMinimize"
         Background="{StaticResource WindowBg}"
@@ -125,18 +125,92 @@
                                   SelectedItem="{Binding MovementMode}"/>
                     </Grid>
 
-                    <Grid Grid.Row="3" Style="{StaticResource SettingRow}">
+                    <Grid Grid.Row="3" Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="28"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="&#xE823;" Style="{StaticResource IconGlyph}"/>
-                        <TextBlock Grid.Column="1" Text="Run duration (hours)" Style="{StaticResource SettingLabel}"/>
-                        <TextBox Grid.Column="2"
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="&#xE823;" Style="{StaticResource IconGlyph}"/>
+                        <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="Run duration (hours)" Style="{StaticResource SettingLabel}" Margin="12,0,12,0"/>
+                            <TextBlock Text="Presets start immediately. Hours apply when using Enabled."
+                                       FontSize="10"
+                                       Foreground="{StaticResource TextMuted}"
+                                       Margin="12,2,12,0"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <TextBox Grid.Row="0" Grid.Column="2"
                                  Style="{StaticResource UtilityTextBox}"
                                  Text="{Binding SessionDurationHoursText, UpdateSourceTrigger=LostFocus}"
                                  LostFocus="NumericField_LostFocus"/>
+                        <StackPanel Grid.Row="1"
+                                    Grid.Column="2"
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    Margin="0,6,0,0">
+                            <Button Content="30m" Margin="0,0,4,0"
+                                    Command="{Binding StartPreset30mCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource UtilityPresetChip}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPreset30mPreferred}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                                <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button Content="1h" Margin="0,0,4,0"
+                                    Command="{Binding StartPreset1hCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource UtilityPresetChip}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPreset1hPreferred}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                                <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button Content="3h" Margin="0,0,4,0"
+                                    Command="{Binding StartPreset3hCommand}">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource UtilityPresetChip}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPreset3hPreferred}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                                <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <Button Content="&#x221E;"
+                                    Command="{Binding StartPresetIndefiniteCommand}"
+                                    ToolTip="Indefinite">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource UtilityPresetChip}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPresetIndefinitePreferred}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                                                <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </StackPanel>
                     </Grid>
 
                     <Grid Grid.Row="4" Style="{StaticResource SettingRowLast}">

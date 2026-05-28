@@ -25,7 +25,9 @@ The architecture stays flat on purpose: manual wiring in `App`, one background w
 - **Keep-awake** — `SetThreadExecutionState` prevents display sleep and system idle while a session is active
 - **Configurable idle threshold** — how long to wait after your last real input before nudging (10–3600 seconds)
 - **Session duration** — run for N hours or unlimited (`0` hours); auto-disable when time is up
-- **System tray** — quick-start presets (30 min, 1 h, 3 h, indefinite), stop session, open settings
+- **Quick presets** — 30m / 1h / 3h / indefinite in the tray menu and main window
+- **Tray icon states** — disabled, active, and session-completed variants at a glance
+- **System tray** — presets, stop session, open settings
 - **Portable settings** — `settings.json` next to the executable
 - **Dark, compact UI** — single settings screen with live status (including session end date/time after a timed session completes)
 - **Single instance** — prevents accidentally running two copies
@@ -108,9 +110,13 @@ Automated release to GitHub via [`scripts/release.ps1`](scripts/release.ps1): pu
 
 3. After installing `gh`, open a **new** terminal so `gh` is on `PATH`. The release script also looks for `C:\Program Files\GitHub CLI\gh.exe` if needed.
 
+#### Branching
+
+After v1.0.0, day-to-day work happens on **`develop`**; releases merge into **`main`** and run `release.ps1` there. See [docs/BRANCHING.md](docs/BRANCHING.md).
+
 #### Workflow
 
-1. Commit and push all changes on `main` (the script requires a **clean** working tree).
+1. Merge `develop` → `main` when ready to ship. Commit and push on `main` (the script requires a **clean** working tree).
 2. Choose `-Version` to match the release tag (`1.0.1` → tag `v1.0.1`). If `StayAwake.csproj` already has that version, the script skips a version commit and tags the current `HEAD`.
 3. Test the build locally, then run a full release:
 
@@ -278,7 +284,8 @@ Created beside `StayAwake.exe` on first run.
   "idleSeconds": 60,
   "minimizeToTray": false,
   "movementMode": "Horizontal",
-  "sessionDurationHours": 0
+  "sessionDurationHours": 0,
+  "sessionDurationMinutes": null
 }
 ```
 
@@ -290,14 +297,15 @@ Created beside `StayAwake.exe` on first run.
 | `minimizeToTray` | bool | Hide window on close/minimize instead of exiting |
 | `movementMode` | enum | `Horizontal`, `Vertical`, or `Random` (unknown values default to `Horizontal`) |
 | `sessionDurationHours` | int | Default duration when enabling from UI (`0` = unlimited) |
+| `sessionDurationMinutes` | int? | When set (e.g. `30`), overrides hours for the default duration |
 
-Tray presets start sessions directly and do not change `sessionDurationHours` in the file.
+Tray and UI presets start sessions immediately and update the saved duration preference (`sessionDurationHours` and/or `sessionDurationMinutes`).
 
 ---
 
 ## Tray behavior
 
-- **Icon:** Embedded `app.ico` WPF resource (fallback: system default).
+- **Icon:** State-specific embedded ICOs (`app-tray-disabled`, `app-tray-active`, `app-tray-completed`; fallback: `app.ico`, then system default).
 - **Tooltip:** `StayAwake — Active`, `Active (1h 12m)`, `Active (no limit)`, `Disabled`, or `Session completed` (63-char limit).
 - **Menu:** Rebuilt when opened; start presets disabled while a session is active.
 - **Balloon:** "Session completed" when a timed session expires.
@@ -315,20 +323,18 @@ Tray presets start sessions directly and do not change `sessionDurationHours` in
 
 ## Known limitations
 
-- Tray **30 minutes** preset does not update the **Run duration (hours)** field (1h/3h/indefinite presets sync where applicable). Remaining time in the status panel always reflects the active session.
-
 Platform and policy constraints: [docs/ARCHITECTURE.md §13](docs/ARCHITECTURE.md#13-weaknesses-and-risks).
 
 ---
 
 ## Roadmap / future ideas
 
-- Tray icon visual state (active / disabled / completed)
-- UI session presets matching tray (30m / 1h / 3h)
+- Custom vector icon (replace Flaticon source) — planned for v1.2+
+- Optional tray duration picker — evaluate carefully
 
 **Not planned:** cloud sync, accounts, telemetry, plugins, schedulers, dashboards.
 
-Full list: [docs/ARCHITECTURE.md § Future opportunities](docs/ARCHITECTURE.md#14-future-opportunities).
+Shipped in v1.1.0 and post-v1 planning: [docs/POST_V1_ROADMAP.md](docs/POST_V1_ROADMAP.md). Full list: [docs/ARCHITECTURE.md §14](docs/ARCHITECTURE.md#14-future-opportunities).
 
 ---
 
@@ -340,6 +346,7 @@ StayAwake is meant to stay **small and understandable**:
 - Avoid DI frameworks, plugin systems, or extra architecture layers.
 - Prefer focused changes over large refactors.
 - Update `docs/ARCHITECTURE.md` when behavior or structure changes meaningfully.
+- Day-to-day work on **`develop`**; releases on **`main`** — [docs/BRANCHING.md](docs/BRANCHING.md).
 
 ### Icon assets
 
