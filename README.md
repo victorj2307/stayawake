@@ -94,20 +94,51 @@ Copy `StayAwake.exe` anywhere. `settings.json` is created on first run in the sa
 
 ### Releasing
 
-Automated release to GitHub (bumps version, commits, tags, pushes, publishes, and creates a release):
+Automated release to GitHub via [`scripts/release.ps1`](scripts/release.ps1): publish a single-file EXE, zip it, commit the version bump (if needed), tag, push, and create a GitHub Release.
 
-```powershell
-.\scripts\release.ps1 -Version 1.0.1
-```
+#### One-time setup
 
-**Prerequisites:** Windows, .NET 8 SDK, [GitHub CLI](https://cli.github.com/) (`gh auth login`), clean working tree on `main`, push access to `origin`.
+1. Install [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) and [GitHub CLI](https://cli.github.com/).
+2. Log in to GitHub (required before a full release):
+
+   ```powershell
+   gh auth login
+   gh auth status
+   ```
+
+3. After installing `gh`, open a **new** terminal so `gh` is on `PATH`. The release script also looks for `C:\Program Files\GitHub CLI\gh.exe` if needed.
+
+#### Workflow
+
+1. Commit and push all changes on `main` (the script requires a **clean** working tree).
+2. Choose `-Version` to match the release tag (`1.0.1` → tag `v1.0.1`). If `StayAwake.csproj` already has that version, the script skips a version commit and tags the current `HEAD`.
+3. Test the build locally, then run a full release:
+
+   ```powershell
+   .\scripts\release.ps1 -Version 1.0.1 -SkipPush   # build + zip only
+   .\scripts\release.ps1 -Version 1.0.1            # tag, push, GitHub Release
+   ```
 
 | Switch | Purpose |
 |--------|---------|
-| `-DryRun` | Show steps without commit, tag, push, or `gh release` |
-| `-SkipPush` | Build and zip only (test publish output) |
+| `-DryRun` | Print steps without publish, commit, tag, push, or `gh release` |
+| `-SkipPush` | Publish and zip to `dist/` only (no git or GitHub steps) |
 
-Release asset: `dist/StayAwake-v{version}-win-x64.zip` containing **only** `StayAwake.exe` (icons embedded in the assembly).
+**Prerequisites for a full release:** Windows, .NET 8 SDK, authenticated `gh`, clean working tree on `main`, push access to `origin`.
+
+**Release asset:** `dist/StayAwake-v{version}-win-x64.zip` containing **only** `StayAwake.exe` (icons embedded in the assembly). The `dist/` folder is gitignored.
+
+#### Troubleshooting
+
+| Problem | What to do |
+|---------|------------|
+| Working tree is not clean | Commit or stash changes, then rerun |
+| `gh` not found | Install GitHub CLI and open a new terminal, or verify `C:\Program Files\GitHub CLI\gh.exe` exists |
+| `gh is not authenticated` | Run `gh auth login` |
+| Tag already exists | Use a new `-Version`, or delete the tag on GitHub if the release was a mistake |
+| Push succeeded but `gh release create` failed | Create the release manually: `gh release create v1.0.1 dist/StayAwake-v1.0.1-win-x64.zip --title "StayAwake v1.0.1"` |
+
+See [docs/ARCHITECTURE.md §16](docs/ARCHITECTURE.md#16-release-automation) for a short technical summary.
 
 ---
 

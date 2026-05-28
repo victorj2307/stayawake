@@ -23,6 +23,7 @@ For a shorter onboarding guide, see the [README](../README.md).
 13. [Weaknesses and risks](#13-weaknesses-and-risks)
 14. [Future opportunities](#14-future-opportunities)
 15. [File reference](#15-file-reference)
+16. [Release automation](#16-release-automation)
 
 ---
 
@@ -577,12 +578,30 @@ Do not add: cloud sync, accounts, telemetry, plugins, schedulers, enterprise das
 | `SettingsStore.cs` | JSON persistence |
 | `TrayIconManager.cs` | System tray icon and menu |
 | `RelayCommand.cs` | `ICommand` for reset button |
-| `StayAwake.csproj` | Project config, asset copy rules |
+| `StayAwake.csproj` | Project config, `ApplicationIcon`, embedded WPF resources |
 | `Assets/*` | Icons; see `Assets/ICON.md` for regeneration |
 | `scripts/generate-icon.py` | Regenerate `.ico` and header PNG from source |
 | `scripts/capture-screenshots.ps1` | Automated window captures for README |
+| `scripts/release.ps1` | Publish, zip, tag, and GitHub Release (see README) |
 | `docs/screenshots/` | README screenshot assets |
 
 ---
 
-*Last updated: publication polish — .NET 8 / single-project WPF utility.*
+## 16. Release automation
+
+Releases are driven by [`scripts/release.ps1`](../scripts/release.ps1) on Windows. Maintainer steps, prerequisites, and troubleshooting are documented in the [README § Releasing](../README.md#releasing).
+
+**What the script does (full run):**
+
+1. Preflight: clean git tree, `dotnet` / `git` / `gh` available, tag `v{version}` does not exist on `origin`.
+2. Set `<Version>` in `StayAwake.csproj` when it differs from `-Version`; otherwise leave the file unchanged.
+3. `dotnet publish` — self-contained, single-file, `win-x64` (same flags as [README § Publish](../README.md#publish-single-portable-exe); run from repo root via the script).
+4. Zip `StayAwake.exe` to `dist/StayAwake-v{version}-win-x64.zip` (EXE only; tray and header icons are embedded WPF resources, not loose files).
+5. Commit csproj only if the version changed; create annotated tag `v{version}`; push branch and tag to `origin`.
+6. `gh release create` with the zip attached (generated release notes when a prior tag exists).
+
+**Related implementation details:** tray icon loads from `pack://application:,,,/Assets/app.ico` ([§10](#10-tray-integration)); publish output should not include an `Assets\` folder beside the EXE.
+
+---
+
+*Last updated: release automation and embedded tray icon — .NET 8 / single-project WPF utility.*
