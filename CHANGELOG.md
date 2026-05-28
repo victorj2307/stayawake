@@ -7,6 +7,8 @@
 - `sessionDurationMinutes` in settings for 30-minute preference persistence
 - `develop` branch workflow documented ([docs/BRANCHING.md](docs/BRANCHING.md))
 - EXE icon uses neutral/disabled appearance; tray uses state-specific ICOs
+- Fix single-instance mutex release on exit (duplicate launch and shutdown)
+- Fix preset chip layout alignment with the 140px settings value column
 
 ## v1.0.0
 

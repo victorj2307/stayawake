@@ -11,6 +11,7 @@ Summary of the first iteration after the stable v1.0.0 release. See [BRANCHING.m
 | **UI presets** | Compact chips under run duration; same durations as tray |
 | **30m settings sync** | `SessionDurationMinutes` in `settings.json` |
 | **Preset chip semantics** | Highlight = saved preference only; runtime state = tray, status card, **Enabled** |
+| **Post-ship fixes (in v1.1.0)** | Mutex release on exit; preset chips aligned to 140px value column |
 
 ## v1.2 (optional, not blocking)
 

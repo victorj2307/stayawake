@@ -29,6 +29,19 @@ StayAwake uses a minimal two-branch workflow after v1.0.0.
 - **Minor** (`1.1.0`): post-v1 feature polish (tray icons, UI presets, etc.).
 - Bump `<Version>` in `StayAwake/StayAwake.csproj` on `develop` before merging to `main`, or let `release.ps1` set it when releasing.
 
+## Releasing (checklist)
+
+Example for **v1.1.0**:
+
+1. Finish and push work on `develop`.
+2. Update [CHANGELOG.md](../CHANGELOG.md) on `develop` if needed; commit and push.
+3. `git checkout main` → `git merge develop` → resolve conflicts if any.
+4. `git push origin main`
+5. From repo root on `main` with a **clean** tree: `.\scripts\release.ps1 -Version 1.1.0`
+6. `git checkout develop` → `git merge main` (sync any release-only commits) → `git push origin develop`
+
+Tags and GitHub Releases are created on **`main`** only (`v1.1.0`, etc.).
+
 ## What we do not use
 
 - GitFlow release branches

@@ -117,12 +117,12 @@ After v1.0.0, day-to-day work happens on **`develop`**; releases merge into **`m
 #### Workflow
 
 1. Merge `develop` → `main` when ready to ship. Commit and push on `main` (the script requires a **clean** working tree).
-2. Choose `-Version` to match the release tag (`1.0.1` → tag `v1.0.1`). If `StayAwake.csproj` already has that version, the script skips a version commit and tags the current `HEAD`.
+2. Choose `-Version` to match the release tag (`1.1.0` → tag `v1.1.0`). If `StayAwake.csproj` already has that version, the script skips a version commit and tags the current `HEAD`.
 3. Test the build locally, then run a full release:
 
    ```powershell
-   .\scripts\release.ps1 -Version 1.0.1 -SkipPush   # build + zip only
-   .\scripts\release.ps1 -Version 1.0.1            # tag, push, GitHub Release
+   .\scripts\release.ps1 -Version 1.1.0 -SkipPush   # build + zip only
+   .\scripts\release.ps1 -Version 1.1.0            # tag, push, GitHub Release
    ```
 
 | Switch | Purpose |
@@ -142,7 +142,7 @@ After v1.0.0, day-to-day work happens on **`develop`**; releases merge into **`m
 | `gh` not found | Install GitHub CLI and open a new terminal, or verify `C:\Program Files\GitHub CLI\gh.exe` exists |
 | `gh is not authenticated` | Run `gh auth login` |
 | Tag already exists | Use a new `-Version`, or delete the tag on GitHub if the release was a mistake |
-| Push succeeded but `gh release create` failed | Create the release manually: `gh release create v1.0.1 dist/StayAwake-v1.0.1-win-x64.zip --title "StayAwake v1.0.1"` |
+| Push succeeded but `gh release create` failed | Create the release manually: `gh release create v1.1.0 dist/StayAwake-v1.1.0-win-x64.zip --title "StayAwake v1.1.0"` |
 
 See [docs/ARCHITECTURE.md §16](docs/ARCHITECTURE.md#16-release-automation) for a short technical summary.
 

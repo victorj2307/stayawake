@@ -508,7 +508,7 @@ On session expiry: 3-second info balloon — "Session completed".
 
 ### Notes
 
-- **Single instance** — `Mutex` in `App.OnStartup` prevents a second process.
+- **Single instance** — `Mutex` in `App.OnStartup` prevents a second process; `ReleaseMutex` runs only when this process acquired ownership (avoids shutdown errors on duplicate launch).
 - **Screenshot helper** — `STAYAWAKE_SCREENSHOT=session-completed` starts a 1s session before show (used by `scripts/capture-screenshots.ps1` only).
 
 ---
