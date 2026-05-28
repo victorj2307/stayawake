@@ -40,6 +40,41 @@ function Assert-Command {
     }
 }
 
+function Get-ProjectVersion {
+    [xml]$proj = Get-Content $csproj
+    foreach ($pg in $proj.Project.PropertyGroup) {
+        if ($null -ne $pg.Version) {
+            return [string]$pg.Version
+        }
+    }
+    throw "Could not find <Version> in $csproj"
+}
+
+function Set-ProjectVersion {
+    param([string]$NewVersion)
+    [xml]$proj = Get-Content $csproj
+    $updated = $false
+    foreach ($pg in $proj.Project.PropertyGroup) {
+        if ($null -ne $pg.Version) {
+            $pg.Version = $NewVersion
+            $updated = $true
+            break
+        }
+    }
+    if (-not $updated) {
+        throw "Could not find <Version> in $csproj"
+    }
+    $proj.Save((Resolve-Path $csproj).Path)
+}
+
+function Invoke-Git {
+    param([string[]]$GitArgs)
+    & git @GitArgs
+    if ($LASTEXITCODE -ne 0) {
+        throw "git $($GitArgs -join ' ') failed with exit code $LASTEXITCODE"
+    }
+}
+
 Push-Location $repoRoot
 try {
     Assert-Command dotnet
@@ -47,8 +82,10 @@ try {
     if (-not $SkipPush) {
         Assert-Command gh
         if (-not $DryRun) {
-            gh auth status 2>&1 | Out-Null
-            if ($LASTEXITCODE -ne 0) { throw 'gh is not authenticated. Run: gh auth login' }
+            & gh auth status
+            if ($LASTEXITCODE -ne 0) {
+                throw 'gh is not authenticated. Run: gh auth login'
+            }
         }
     }
 
@@ -57,11 +94,15 @@ try {
         throw "Working tree is not clean. Commit or stash changes before releasing.`n$status"
     }
 
-    if (git tag -l $tag) {
+    $localTags = git tag -l $tag
+    if ($localTags) {
         throw "Tag $tag already exists locally."
     }
 
     $remoteTag = git ls-remote --tags origin "refs/tags/$tag"
+    if ($LASTEXITCODE -ne 0) {
+        throw "git ls-remote failed. Check network and remote 'origin'."
+    }
     if ($remoteTag) {
         throw "Tag $tag already exists on origin."
     }
@@ -71,22 +112,14 @@ try {
         Write-Warning "Current branch is '$branch', not 'main'."
     }
 
-    if (-not $DryRun) {
-        [xml]$proj = Get-Content $csproj
-        $updated = $false
-        foreach ($pg in $proj.Project.PropertyGroup) {
-            if ($null -ne $pg.Version) {
-                $pg.Version = $Version
-                $updated = $true
-                break
-            }
-        }
-        if (-not $updated) {
-            throw "Could not find <Version> in $csproj"
-        }
-        $proj.Save((Resolve-Path $csproj).Path)
+    $currentVersion = Get-ProjectVersion
+    if ($currentVersion -eq $Version) {
+        Write-Host "csproj already at version $Version; no version file change needed."
+    } elseif (-not $DryRun) {
+        Set-ProjectVersion -NewVersion $Version
+        Write-Host "Updated csproj version: $currentVersion -> $Version"
     } else {
-        Write-Host "[dry-run] Would set <Version> to $Version in StayAwake.csproj"
+        Write-Host "[dry-run] Would set <Version> from $currentVersion to $Version in StayAwake.csproj"
     }
 
     $publishArgs = @(
@@ -98,9 +131,14 @@ try {
         '-p:IncludeNativeLibrariesForSelfExtract=true'
     )
 
-    Invoke-Step 'Publishing StayAwake (win-x64, single-file)...' {
-        dotnet @publishArgs
-        if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed with exit code $LASTEXITCODE" }
+    if ($DryRun) {
+        Write-Host "[dry-run] Publishing StayAwake (win-x64, single-file)..."
+    } else {
+        Write-Host 'Publishing StayAwake (win-x64, single-file)...'
+        & dotnet @publishArgs
+        if ($LASTEXITCODE -ne 0) {
+            throw "dotnet publish failed with exit code $LASTEXITCODE"
+        }
     }
 
     if (-not $DryRun) {
@@ -116,7 +154,7 @@ try {
 
         New-Item -ItemType Directory -Path $distDir -Force | Out-Null
         if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-        Compress-Archive -Path $exe -DestinationPath $zipPath -Force
+        Compress-Archive -Path $exe -DestinationPath $zipPath -CompressionLevel Optimal -Force
         Write-Host "Created $zipPath"
     } else {
         Write-Host "[dry-run] Would zip $exe to $zipPath"
@@ -127,30 +165,34 @@ try {
         return
     }
 
-    Invoke-Step "Committing version $Version..." {
-        git add $csproj
-        git commit -m "Release $tag"
-        if ($LASTEXITCODE -ne 0) { throw 'git commit failed' }
+    Invoke-Step "Committing version $Version (if changed)..." {
+        Invoke-Git @('add', $csproj)
+        git diff --cached --quiet
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "No csproj changes to commit; tagging current HEAD."
+        } else {
+            Invoke-Git @('commit', '-m', "Release $tag")
+        }
     }
 
     Invoke-Step "Creating tag $tag..." {
-        git tag -a $tag -m "StayAwake $tag"
-        if ($LASTEXITCODE -ne 0) { throw 'git tag failed' }
+        Invoke-Git @('tag', '-a', $tag, '-m', "StayAwake $tag")
     }
 
     Invoke-Step 'Pushing branch and tag to origin...' {
-        git push origin HEAD
-        if ($LASTEXITCODE -ne 0) { throw 'git push failed' }
-        git push origin $tag
-        if ($LASTEXITCODE -ne 0) { throw 'git push tag failed' }
+        Invoke-Git @('push', 'origin', 'HEAD')
+        Invoke-Git @('push', 'origin', $tag)
     }
 
     Invoke-Step "Creating GitHub release $tag..." {
         $notesFile = [System.IO.Path]::GetTempFileName()
         try {
-            $hasPriorTag = [bool](git describe --tags --abbrev=0 HEAD^ 2>$null)
+            $hasPriorTag = $false
+            git describe --tags --abbrev=0 HEAD^ 2>$null | Out-Null
+            if ($LASTEXITCODE -eq 0) { $hasPriorTag = $true }
+
             if ($hasPriorTag) {
-                gh release create $tag $zipPath --title "StayAwake $tag" --generate-notes
+                & gh release create $tag $zipPath --title "StayAwake $tag" --generate-notes
             } else {
                 @"
 StayAwake **$tag** — Windows x64 portable build.
@@ -163,9 +205,11 @@ StayAwake **$tag** — Windows x64 portable build.
 - Windows 10 or later
 - No administrator rights required
 "@ | Set-Content -Path $notesFile -Encoding utf8
-                gh release create $tag $zipPath --title "StayAwake $tag" --notes-file $notesFile
+                & gh release create $tag $zipPath --title "StayAwake $tag" --notes-file $notesFile
             }
-            if ($LASTEXITCODE -ne 0) { throw 'gh release create failed' }
+            if ($LASTEXITCODE -ne 0) {
+                throw 'gh release create failed'
+            }
         } finally {
             Remove-Item $notesFile -Force -ErrorAction SilentlyContinue
         }
@@ -173,7 +217,7 @@ StayAwake **$tag** — Windows x64 portable build.
 
     Write-Host "Release $tag complete."
     if (-not $DryRun) {
-        gh release view $tag --web 2>$null
+        & gh release view $tag --web 2>$null
     }
 }
 finally {
