@@ -1,6 +1,7 @@
 # Build
 [Bb]in/
 [Oo]bj/
+dist/
 .vs/
 
 # IDE

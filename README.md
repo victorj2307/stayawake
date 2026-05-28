@@ -92,15 +92,22 @@ StayAwake\bin\Release\net8.0-windows\win-x64\publish\StayAwake.exe
 
 Copy `StayAwake.exe` anywhere. `settings.json` is created on first run in the same directory.
 
-### Releases
+### Releasing
 
-Suggested GitHub release asset name:
+Automated release to GitHub (bumps version, commits, tags, pushes, publishes, and creates a release):
 
+```powershell
+.\scripts\release.ps1 -Version 1.0.1
 ```
-StayAwake-v1.0.0-win-x64.zip
-```
 
-Contents: `StayAwake.exe` (and `Assets\` if icons are not embedded in your publish profile).
+**Prerequisites:** Windows, .NET 8 SDK, [GitHub CLI](https://cli.github.com/) (`gh auth login`), clean working tree on `main`, push access to `origin`.
+
+| Switch | Purpose |
+|--------|---------|
+| `-DryRun` | Show steps without commit, tag, push, or `gh release` |
+| `-SkipPush` | Build and zip only (test publish output) |
+
+Release asset: `dist/StayAwake-v{version}-win-x64.zip` containing **only** `StayAwake.exe` (icons embedded in the assembly).
 
 ---
 
@@ -199,6 +206,8 @@ stayawake/
 ├── LICENSE
 ├── ATTRIBUTIONS.md
 ├── README.md
+├── scripts/
+│   └── release.ps1
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   └── screenshots/
@@ -257,7 +266,7 @@ Tray presets start sessions directly and do not change `sessionDurationHours` in
 
 ## Tray behavior
 
-- **Icon:** `Assets/app.ico` next to the EXE (fallback: system default).
+- **Icon:** Embedded `app.ico` WPF resource (fallback: system default).
 - **Tooltip:** `StayAwake — Active`, `Active (1h 12m)`, `Active (no limit)`, `Disabled`, or `Session completed` (63-char limit).
 - **Menu:** Rebuilt when opened; start presets disabled while a session is active.
 - **Balloon:** "Session completed" when a timed session expires.

@@ -436,7 +436,7 @@ Tray and worker continue until Exit from tray menu or close without minimize-to-
 
 ### Icon
 
-Loads `Assets/app.ico` from `AppContext.BaseDirectory`. Falls back to `SystemIcons.Application` if missing.
+Loads `Assets/app.ico` from the WPF pack URI (`pack://application:,,,/Assets/app.ico`). Falls back to `SystemIcons.Application` if the resource is missing.
 
 ### Interactions
 

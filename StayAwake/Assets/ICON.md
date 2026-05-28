@@ -5,8 +5,8 @@ See the [README](../../README.md) for build and publish instructions. Third-part
 | File | Purpose |
 |------|---------|
 | `app-icon-source.png` | Master artwork (edit this) |
-| `app.ico` | Windows EXE, taskbar, tray |
-| `app-header.png` | In-app header (transparent background) |
+| `app.ico` | Windows EXE icon (`ApplicationIcon`), embedded WPF resource (tray) |
+| `app-header.png` | In-app header via pack URI (embedded WPF resource) |
 
 Regenerate `app.ico` and `app-header.png` after changing the source:
 
