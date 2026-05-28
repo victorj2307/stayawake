@@ -164,7 +164,7 @@ stateDiagram-v2
 |-------|---------------------|---------------------------|-------------|
 | **Disabled** | `false` | Off (restore normal power management) | Editable |
 | **Active** | `true` | On (`ES_SYSTEM_REQUIRED \| ES_DISPLAY_REQUIRED`) | Locked (`CanEditSettings == false`) |
-| **SessionCompleted** | `false` (set by `CompleteSession`) | Off | Editable; status shows "Session completed" |
+| **SessionCompleted** | `false` (set by `CompleteSession`) | Off | Editable; status shows "Session completed" and session ended date/time |
 
 ### Session timestamps
 
@@ -172,7 +172,8 @@ stateDiagram-v2
 |----------|------|-------|
 | `SessionStartedAt` | `DateTime?` (UTC) | Set on `StartSession` |
 | `SessionEndsAt` | `DateTime?` (UTC) | `null` = unlimited session |
-| `LastMoved` | `DateTime?` (local) | Last synthetic mouse jiggle |
+| `SessionEndedAt` | `DateTime?` (UTC) | Set on `CompleteSession`; cleared on `StartSession` / `StopSession`; not persisted |
+| `LastMoved` | `DateTime?` (UTC) | Last synthetic mouse jiggle; preserved after session completion |
 
 **Unlimited session:** `SessionDurationHours == 0` in the UI → `StartSession(null)` → `SessionEndsAt == null`. `IsUnlimitedSession` is true when enabled, started, and no end time.
 
@@ -188,11 +189,12 @@ Called from UI toggle, tray presets, ViewModel constructor (if persisted enabled
 
 1. `SessionStartedAt = UtcNow`
 2. `SessionEndsAt = duration is null ? null : UtcNow + duration`
-3. `_settings.Enabled = true`
-4. `LastMoved = null` (reset jiggle rate limit)
-5. `Status = Active`
-6. `SyncKeepAwake()` → `NativeMethods.SetKeepAwake(true)`
-7. `StatusChanged` event
+3. `SessionEndedAt = null`
+4. `_settings.Enabled = true`
+5. `LastMoved = null` (reset jiggle rate limit)
+6. `Status = Active`
+7. `SyncKeepAwake()` → `NativeMethods.SetKeepAwake(true)`
+8. `StatusChanged` event
 
 ViewModel wrapper also saves settings and refreshes bindings.
 
@@ -201,7 +203,7 @@ ViewModel wrapper also saves settings and refreshes bindings.
 Called from UI toggle off, tray "Disable", or reset.
 
 1. `_settings.Enabled = false`
-2. Clear `SessionStartedAt`, `SessionEndsAt`, `LastMoved`
+2. Clear `SessionStartedAt`, `SessionEndsAt`, `SessionEndedAt`, `LastMoved`
 3. `Status = Disabled`
 4. `SyncKeepAwake(false)`
 5. `StatusChanged` event
@@ -211,7 +213,7 @@ Called from UI toggle off, tray "Disable", or reset.
 Called when `IsSessionExpired()` is true on a timer tick.
 
 1. `_settings.Enabled = false`
-2. Clear session timestamps and `LastMoved`
+2. `SessionEndedAt = UtcNow`; clear `SessionStartedAt` and `SessionEndsAt` (keep `LastMoved`)
 3. `Status = SessionCompleted` (not `Disabled`—distinct UX)
 4. `SyncKeepAwake(false)`
 5. `SessionCompleted` event
@@ -385,7 +387,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 - **Compact utility:** one window, no navigation, no dashboard.
 - **Dark theme:** `#141414` window background, card-based layout, custom toggle/combo/textbox styles in `App.xaml`.
 - **Session-oriented:** master "Enabled" toggle starts a session; settings lock while active.
-- **Status at a glance:** right column shows state, remaining time, last movement time.
+- **Status at a glance:** right column shows state, remaining time (or session ended date/time when completed), last movement time.
 
 ### MainWindow layout
 
@@ -394,7 +396,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 | Header | App icon + title + tagline |
 | Left card | Enabled toggle |
 | Left grid | Idle seconds, movement pixels, direction combo, run duration (hours), minimize-to-tray |
-| Right card | Status: state pill + dot, remaining, last movement |
+| Right card | Status: state pill + dot, remaining or session ended (label switches), last movement |
 | Footer | Version string, Reset settings button |
 
 ### Binding strategy
@@ -403,6 +405,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 - **Movement direction:** `MovementMode` enum bound to ComboBox `ItemsSource` / `SelectedItem`.
 - **Numeric fields:** string properties (`IdleSecondsText`, etc.) with `UpdateSourceTrigger=LostFocus`; parse and clamp on set; revert invalid text on `LostFocus` via `RevertInvalidNumericFields`.
 - **Clamps:** idle 10–3600 s, pixels 1–10, session hours 0–99.
+- **Status row 2:** `RemainingLabelText` (`"Remaining"` or `"Session ended"`) and `RemainingDisplayText` (countdown, `"Unlimited"`, ended-at via `SessionDisplay.FormatSessionEndedAt`, or `"—"`).
 
 ### `CanEditSettings`
 
@@ -488,7 +491,7 @@ On session expiry: 3-second info balloon — "Session completed".
 ### Worker vs ViewModel on `StatusChanged`
 
 - **Worker** compares runtime-only snapshot: `Status`, `LastMoved` (UTC), remaining seconds (`int?`, `null` when unlimited).
-- **ViewModel** formats display strings (`RemainingDisplayText`, `LastMovementValue` in local time) and notifies only status-related bindings on timer ticks—not `MovementMode`, settings text fields, etc.
+- **ViewModel** formats display strings (`RemainingLabelText`, `RemainingDisplayText`, `LastMovementValue` in local time) and notifies only status-related bindings on timer ticks—not `MovementMode`, settings text fields, etc.
 - **Configuration refresh** (`RefreshAll`) runs on user/session actions (`StartSession`, `StopSession`, reset), not every timer tick.
 
 ### Notes
@@ -565,7 +568,7 @@ Do not add: cloud sync, accounts, telemetry, plugins, schedulers, enterprise das
 | `AppStatus.cs` | `Active`, `Disabled`, `SessionCompleted` |
 | `MovementMode.cs` | Movement direction enum |
 | `MovementModeJsonConverter.cs` | Tolerant JSON enum serialization |
-| `SessionDisplay.cs` | Shared remaining-time formatting for UI and tray |
+| `SessionDisplay.cs` | Shared remaining-time and session-ended-at formatting for UI and tray |
 | `MainWindow.xaml` | Settings UI layout and bindings |
 | `MainWindow.xaml.cs` | Minimize-to-tray, numeric field revert on lost focus |
 | `MainViewModel.cs` | Bindings, validation, session commands, worker event handling |

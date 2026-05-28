@@ -27,7 +27,7 @@ The architecture stays flat on purpose: manual wiring in `App`, one background w
 - **Session duration** — run for N hours or unlimited (`0` hours); auto-disable when time is up
 - **System tray** — quick-start presets (30 min, 1 h, 3 h, indefinite), stop session, open settings
 - **Portable settings** — `settings.json` next to the executable
-- **Dark, compact UI** — single settings screen with live status
+- **Dark, compact UI** — single settings screen with live status (including session end date/time after a timed session completes)
 - **Single instance** — prevents accidentally running two copies
 
 ---
@@ -38,7 +38,7 @@ The architecture stays flat on purpose: manual wiring in `App`, one background w
 |----------------|----------|
 | ![Main window — active session](docs/screenshots/main-active.png) | ![Main window — disabled](docs/screenshots/main-disabled.png) |
 
-| Session completed | Tray menu |
+| Session completed (shows **Session ended** time) | Tray menu |
 |-------------------|-----------|
 | ![Session completed](docs/screenshots/main-session-completed.png) | ![Tray context menu](docs/screenshots/tray-menu.png) |
 
@@ -162,7 +162,7 @@ For state diagrams, worker loop pseudocode, Win32 details, and threading notes, 
 
 - **Start** — `StartSession(duration)` sets timestamps, enables keep-awake, begins idle monitoring.
 - **Stop** — `StopSession()` or tray **Stop session** ends the session.
-- **Auto-stop** — when `SessionEndsAt` is reached, status becomes **Session completed**, settings saved, tray balloon shown.
+- **Auto-stop** — when `SessionEndsAt` is reached, status becomes **Session completed**, settings saved, tray balloon shown; the Status panel shows **Session ended** with the local date and time (in memory until you start a new session or disable).
 
 **Idle behavior:** Each second, if you've been idle for at least `IdleSeconds` *and* the last synthetic jiggle was at least `IdleSeconds` ago, the worker nudges the mouse and resets the rate limit.
 
@@ -172,7 +172,7 @@ For state diagrams, worker loop pseudocode, Win32 details, and threading notes, 
 
 - **Compact utility** — one screen, no tabs or dashboards.
 - **Dark theme** — low-contrast grays and green accent; Segoe MDL2 icons for settings rows.
-- **Status sidebar** — state, remaining time, last movement—no log viewer.
+- **Status sidebar** — state, remaining time (or session ended date/time when completed), last movement—no log viewer.
 - **Session-oriented workflow** — enable = start a session; configure duration and idle rules before or between sessions.
 
 ---

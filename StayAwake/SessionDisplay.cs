@@ -1,7 +1,12 @@
+using System.Globalization;
+
 namespace StayAwake;
 
 internal static class SessionDisplay
 {
+    public static string FormatSessionEndedAt(DateTime utc) =>
+        utc.ToLocalTime().ToString("g", CultureInfo.CurrentCulture);
+
     public static string FormatRemaining(TimeSpan remaining)
     {
         if (remaining <= TimeSpan.Zero)

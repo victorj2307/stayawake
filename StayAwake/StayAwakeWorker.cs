@@ -21,6 +21,7 @@ public sealed class StayAwakeWorker : IDisposable
     public AppStatus Status { get; private set; } = AppStatus.Disabled;
     public DateTime? SessionStartedAt { get; private set; }
     public DateTime? SessionEndsAt { get; private set; }
+    public DateTime? SessionEndedAt { get; private set; }
     public DateTime? LastMoved { get; private set; }
 
     public event Action? StatusChanged;
@@ -69,6 +70,7 @@ public sealed class StayAwakeWorker : IDisposable
     {
         SessionStartedAt = DateTime.UtcNow;
         SessionEndsAt = duration is null ? null : DateTime.UtcNow.Add(duration.Value);
+        SessionEndedAt = null;
         _settings.Enabled = true;
         LastMoved = null;
         Status = AppStatus.Active;
@@ -82,6 +84,7 @@ public sealed class StayAwakeWorker : IDisposable
         _settings.Enabled = false;
         SessionStartedAt = null;
         SessionEndsAt = null;
+        SessionEndedAt = null;
         LastMoved = null;
         Status = AppStatus.Disabled;
         SyncKeepAwake();
@@ -143,9 +146,9 @@ public sealed class StayAwakeWorker : IDisposable
     private void CompleteSession()
     {
         _settings.Enabled = false;
+        SessionEndedAt = DateTime.UtcNow;
         SessionStartedAt = null;
         SessionEndsAt = null;
-        LastMoved = null;
         Status = AppStatus.SessionCompleted;
         SyncKeepAwake();
         NotifyStatusChanged();

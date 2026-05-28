@@ -17,7 +17,7 @@ Capture guide for README images. Use a **Release** build on Windows with dark th
 |------|----------------|
 | `main-active.png` | Enable session, idle 60s, run duration 1h. Status: **Active**, remaining time visible. |
 | `main-disabled.png` | Enabled off. All settings editable. |
-| `main-session-completed.png` | Let a short session expire, or use a 0.01h test duration. Status: **Session completed**. |
+| `main-session-completed.png` | Let a short session expire, or use `STAYAWAKE_SCREENSHOT=session-completed` (1s session). Status: **Session completed**; **Session ended** row shows local date and time. |
 | `tray-menu.png` | Right-click tray icon with context menu fully visible. |
 
 ## Capture steps

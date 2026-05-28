@@ -50,7 +50,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="228"/>
             </Grid.ColumnDefinitions>
 
             <!-- Main settings -->
@@ -159,6 +159,11 @@
             <!-- Status -->
             <Border Grid.Column="2" Style="{StaticResource CardBorder}" Padding="10,10" VerticalAlignment="Top">
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -168,54 +173,49 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0"
+                               Grid.ColumnSpan="3"
                                Text="Status"
                                FontSize="12"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource AccentGreen}"
                                Margin="0,0,0,6"/>
 
-                    <Grid Grid.Row="1" Style="{StaticResource StatusRow}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="State" Style="{StaticResource StatusLabel}"/>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Ellipse Style="{StaticResource StatusDot}" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding StatusPillText}"
-                                       FontSize="12"
-                                       Foreground="{StaticResource TextPrimary}"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Grid>
-
-                    <Grid Grid.Row="2" Style="{StaticResource StatusRow}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Remaining" Style="{StaticResource StatusLabel}"/>
-                        <TextBlock Grid.Column="1"
-                                   Text="{Binding RemainingDisplayText}"
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="0"
+                               Text="State"
+                               Style="{StaticResource StatusLabel}"
+                               Margin="0,0,0,6"/>
+                    <StackPanel Grid.Row="1"
+                                Grid.Column="2"
+                                Orientation="Horizontal"
+                                Margin="0,0,0,6">
+                        <Ellipse Style="{StaticResource StatusDot}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding StatusPillText}"
                                    FontSize="12"
-                                   Foreground="{StaticResource AccentGreen}"
-                                   HorizontalAlignment="Right"
+                                   Foreground="{StaticResource TextPrimary}"
                                    VerticalAlignment="Center"/>
-                    </Grid>
+                    </StackPanel>
 
-                    <Grid Grid.Row="3" Style="{StaticResource StatusRowLast}" Margin="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Last movement" Style="{StaticResource StatusLabel}"/>
-                        <TextBlock Grid.Column="1"
-                                   Text="{Binding LastMovementValue}"
-                                   FontSize="12"
-                                   Foreground="{StaticResource TextSecondary}"
-                                   HorizontalAlignment="Right"
-                                   VerticalAlignment="Center"/>
-                    </Grid>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="0"
+                               Text="{Binding RemainingLabelText}"
+                               Style="{StaticResource StatusLabel}"
+                               Margin="0,0,0,6"/>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="2"
+                               Text="{Binding RemainingDisplayText}"
+                               Style="{StaticResource StatusValue}"
+                               Foreground="{StaticResource AccentGreen}"
+                               Margin="0,0,0,6"/>
+
+                    <TextBlock Grid.Row="3"
+                               Grid.Column="0"
+                               Text="Last movement"
+                               Style="{StaticResource StatusLabel}"/>
+                    <TextBlock Grid.Row="3"
+                               Grid.Column="2"
+                               Text="{Binding LastMovementValue}"
+                               Style="{StaticResource StatusValue}"/>
                 </Grid>
             </Border>
         </Grid>

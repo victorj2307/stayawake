@@ -271,6 +271,9 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    public string RemainingLabelText =>
+        Status == AppStatus.SessionCompleted ? "Session ended" : "Remaining";
+
     public string RemainingDisplayText
     {
         get
@@ -279,7 +282,11 @@ public sealed class MainViewModel : INotifyPropertyChanged
                 return "—";
 
             if (Status == AppStatus.SessionCompleted)
-                return "—";
+            {
+                return _worker.SessionEndedAt is { } ended
+                    ? SessionDisplay.FormatSessionEndedAt(ended)
+                    : "—";
+            }
 
             if (_worker.IsUnlimitedSession)
                 return "Unlimited";
@@ -342,6 +349,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     {
         OnPropertyChanged(nameof(Status));
         OnPropertyChanged(nameof(StatusPillText));
+        OnPropertyChanged(nameof(RemainingLabelText));
         OnPropertyChanged(nameof(RemainingTimeValue));
         OnPropertyChanged(nameof(RemainingDisplayText));
         OnPropertyChanged(nameof(LastMovementValue));
