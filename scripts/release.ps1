@@ -111,6 +111,57 @@ function Invoke-Git {
     }
 }
 
+function Get-GitHubRepoSlug {
+    if (-not $script:GhExe) { $script:GhExe = Resolve-GhExe }
+    $slug = & $script:GhExe repo view --json nameWithOwner -q .nameWithOwner 2>$null
+    if ($LASTEXITCODE -eq 0 -and $slug) {
+        return $slug.Trim()
+    }
+
+    $remote = git remote get-url origin 2>$null
+    if ($remote -match 'github\.com[:/]([^/]+/[^/.]+)') {
+        return $Matches[1]
+    }
+
+    throw 'Could not resolve GitHub repo slug. Set origin to github.com or run: gh auth login'
+}
+
+function Get-LatestReleaseTag {
+    $tags = @(git tag --list 'v*' --sort=-v:refname)
+    if ($tags.Count -gt 0) { return $tags[0] }
+    return $null
+}
+
+function New-ReleaseNotesBody {
+    param(
+        [string]$Version,
+        [string]$Tag,
+        [string]$ZipName,
+        [string]$PrevTag,
+        [string]$RepoSlug
+    )
+
+    $templatePath = Join-Path $PSScriptRoot 'GITHUB_RELEASE_NOTES.md'
+    if (-not (Test-Path $templatePath)) {
+        throw "Release notes template not found: $templatePath"
+    }
+
+    $changelogLine = if ($PrevTag) {
+        "**Full Changelog**: https://github.com/$RepoSlug/compare/${PrevTag}...${Tag}"
+    } else {
+        ''
+    }
+
+    $body = Get-Content -Path $templatePath -Raw -Encoding utf8
+    $body = $body.Replace('{{TAG}}', $Tag)
+    $body = $body.Replace('{{VERSION}}', $Version)
+    $body = $body.Replace('{{ZIP_NAME}}', $ZipName)
+    $body = $body.Replace('{{PREV_TAG}}', $(if ($PrevTag) { $PrevTag } else { '' }))
+    $body = $body.Replace('{{REPO}}', $RepoSlug)
+    $body = $body.Replace('{{CHANGELOG_LINE}}', $changelogLine)
+    return ($body.TrimEnd() + "`n")
+}
+
 Push-Location $repoRoot
 try {
     Assert-Command dotnet
@@ -202,6 +253,13 @@ try {
         return
     }
 
+    $previousTag = Get-LatestReleaseTag
+    if ($previousTag) {
+        Write-Host "Previous release tag: $previousTag (changelog compare baseline)"
+    } else {
+        Write-Host 'No prior v* tag; release notes will omit changelog compare link.'
+    }
+
     Invoke-Step "Committing version $Version (if changed)..." {
         Invoke-Git @('add', $csproj)
         git diff --cached --quiet
@@ -224,26 +282,11 @@ try {
     Invoke-Step "Creating GitHub release $tag..." {
         $notesFile = [System.IO.Path]::GetTempFileName()
         try {
-            $hasPriorTag = $false
-            git describe --tags --abbrev=0 HEAD^ 2>$null | Out-Null
-            if ($LASTEXITCODE -eq 0) { $hasPriorTag = $true }
-
-            if ($hasPriorTag) {
-                Invoke-Gh @('release', 'create', $tag, $zipPath, '--title', "StayAwake $tag", '--generate-notes')
-            } else {
-                @"
-StayAwake **$tag** — Windows x64 portable build.
-
-## Install
-1. Download ``$zipName`` from this release.
-2. Extract and run ``StayAwake.exe`` (no installer; ``settings.json`` is created beside the EXE).
-
-## Requirements
-- Windows 10 or later
-- No administrator rights required
-"@ | Set-Content -Path $notesFile -Encoding utf8
-                Invoke-Gh @('release', 'create', $tag, $zipPath, '--title', "StayAwake $tag", '--notes-file', $notesFile)
-            }
+            $repoSlug = Get-GitHubRepoSlug
+            $notes = New-ReleaseNotesBody -Version $Version -Tag $tag -ZipName $zipName `
+                -PrevTag $previousTag -RepoSlug $repoSlug
+            Set-Content -Path $notesFile -Value $notes -Encoding utf8 -NoNewline
+            Invoke-Gh @('release', 'create', $tag, $zipPath, '--title', "StayAwake $tag", '--notes-file', $notesFile)
         } finally {
             Remove-Item $notesFile -Force -ErrorAction SilentlyContinue
         }

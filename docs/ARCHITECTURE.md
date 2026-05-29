@@ -668,7 +668,7 @@ Releases are driven by [`scripts/release.ps1`](../scripts/release.ps1) on Window
 3. `dotnet publish` — self-contained, single-file, `win-x64` (same flags as [README § Publish](../README.md#publish-single-portable-exe); run from repo root via the script).
 4. Zip `StayAwake.exe` to `dist/StayAwake-v{version}-win-x64.zip` (EXE only; tray and header icons are embedded WPF resources, not loose files).
 5. Commit csproj only if the version changed; create annotated tag `v{version}`; push branch and tag to `origin`.
-6. `gh release create` with the zip attached (generated release notes when a prior tag exists).
+6. `gh release create` with the zip attached; body rendered from [`scripts/GITHUB_RELEASE_NOTES.md`](../scripts/GITHUB_RELEASE_NOTES.md) (`{{TAG}}`, `{{ZIP_NAME}}`, `{{CHANGELOG_LINE}}`, etc.).
 
 **Related implementation details:** tray icons are embedded WPF resources ([§10](#10-tray-integration)); publish output should not include an `Assets\` folder beside the EXE. Merge `develop` → `main` before running the script ([BRANCHING.md](BRANCHING.md)).
 

@@ -164,6 +164,23 @@ After v1.0.0, day-to-day work happens on **`develop`**; releases merge into **`m
 
 **Release asset:** `dist/StayAwake-v{version}-win-x64.zip` containing **only** `StayAwake.exe` (icons embedded in the assembly). The `dist/` folder is gitignored.
 
+#### GitHub Release description
+
+Every full run of `release.ps1` fills the release body from [`scripts/GITHUB_RELEASE_NOTES.md`](scripts/GITHUB_RELEASE_NOTES.md). Edit that file to change install steps, requirements, or wording for **all future** releases.
+
+Placeholders are replaced automatically:
+
+| Placeholder | Example |
+|-------------|---------|
+| `{{TAG}}` | `v1.2.1` |
+| `{{VERSION}}` | `1.2.1` |
+| `{{ZIP_NAME}}` | `StayAwake-v1.2.1-win-x64.zip` |
+| `{{PREV_TAG}}` | `v1.2.0` (latest `v*` tag before this release) |
+| `{{REPO}}` | `victorj2307/stayawake` |
+| `{{CHANGELOG_LINE}}` | `**Full Changelog**: https://github.com/victorj2307/stayawake/compare/v1.2.0...v1.2.1` (omitted on the first release) |
+
+To fix an **already published** release, edit it on GitHub or use `gh release edit v1.2.0 --notes-file <rendered.md>` with placeholders already substituted.
+
 #### Troubleshooting
 
 | Problem | What to do |
