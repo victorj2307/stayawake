@@ -13,6 +13,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+# Git/gh emit progress on stderr; PowerShell 7+ must not treat that as a terminating error.
+$PSNativeCommandUseErrorActionPreference = $false
 
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $csproj = Join-Path $repoRoot 'StayAwake\StayAwake.csproj'
@@ -209,12 +211,9 @@ Then run release.ps1 from main. See docs/BRANCHING.md.
     }
 
     if (-not $SkipPush) {
-        git fetch origin main 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            throw 'git fetch origin main failed. Check network and remote.'
-        }
-        $localMain = git rev-parse HEAD
-        $remoteMain = git rev-parse origin/main 2>$null
+        Invoke-Git @('fetch', 'origin', 'main')
+        $localMain = (git rev-parse HEAD).Trim()
+        $remoteMain = (git rev-parse origin/main).Trim()
         if ($LASTEXITCODE -ne 0) {
             throw 'Could not resolve origin/main. Push main to origin before releasing.'
         }
