@@ -3,6 +3,7 @@
 ## v1.2.1
 
 - Fix disabled **Movement direction** combo box styling to match other locked settings (disabled background, border, and muted text)
+- Consistent vertical spacing between setting rows (top-aligned inputs; uniform row and preset gaps)
 
 ## v1.2.0
 

@@ -83,19 +83,19 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid Grid.Row="0" Style="{StaticResource SettingRow}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="28"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="&#xE121;" Style="{StaticResource IconGlyph}"/>
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="Idle time (seconds)" Style="{StaticResource SettingLabel}" Margin="12,0,12,0"/>
+                        <TextBlock Grid.Column="0" Text="&#xE121;" Style="{StaticResource SettingRowIcon}"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Top">
+                            <TextBlock Text="Idle time (seconds)" Style="{StaticResource SettingLabel}"/>
                             <TextBlock Text="{Binding IdleSecondsRangeHint}" Style="{StaticResource SettingHint}"/>
                         </StackPanel>
                         <local:NumericStepper Grid.Column="2"
-                                              VerticalAlignment="Center"
+                                              VerticalAlignment="Top"
                                               MaxLength="4"
                                               Minimum="{x:Static local:SettingLimits.IdleSecondsMin}"
                                               Maximum="{x:Static local:SettingLimits.IdleSecondsMax}"
@@ -104,19 +104,19 @@
                                               LostFocus="NumericField_LostFocus"/>
                     </Grid>
 
-                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                    <Grid Grid.Row="1" Style="{StaticResource SettingRow}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="28"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="&#xE962;" Style="{StaticResource IconGlyph}"/>
-                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="Movement (pixels)" Style="{StaticResource SettingLabel}" Margin="12,0,12,0"/>
+                        <TextBlock Grid.Column="0" Text="&#xE962;" Style="{StaticResource SettingRowIcon}"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Top">
+                            <TextBlock Text="Movement (pixels)" Style="{StaticResource SettingLabel}"/>
                             <TextBlock Text="{Binding MovementPixelsRangeHint}" Style="{StaticResource SettingHint}"/>
                         </StackPanel>
                         <local:NumericStepper Grid.Column="2"
-                                              VerticalAlignment="Center"
+                                              VerticalAlignment="Top"
                                               MaxLength="2"
                                               Minimum="{x:Static local:SettingLimits.MovementPixelsMin}"
                                               Maximum="{x:Static local:SettingLimits.MovementPixelsMax}"
@@ -131,16 +131,17 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="&#xE8B8;" Style="{StaticResource IconGlyph}"/>
+                        <TextBlock Grid.Column="0" Text="&#xE8B8;" Style="{StaticResource SettingRowIcon}"/>
                         <TextBlock Grid.Column="1" Text="Movement direction" Style="{StaticResource SettingLabel}"/>
                         <ComboBox Grid.Column="2"
+                                  VerticalAlignment="Top"
                                   Style="{StaticResource UtilityComboBox}"
                                   ItemContainerStyle="{StaticResource UtilityComboBoxItem}"
                                   ItemsSource="{Binding MovementModes}"
                                   SelectedItem="{Binding MovementMode}"/>
                     </Grid>
 
-                    <Grid Grid.Row="3" Margin="0,0,0,10">
+                    <Grid Grid.Row="3" Style="{StaticResource SettingRow}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="28"/>
                             <ColumnDefinition Width="*"/>
@@ -150,16 +151,16 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="&#xE823;" Style="{StaticResource IconGlyph}"/>
-                        <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
-                            <TextBlock Text="Run duration (hours)" Style="{StaticResource SettingLabel}" Margin="12,0,12,0"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="&#xE823;" Style="{StaticResource SettingRowIcon}"/>
+                        <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Top">
+                            <TextBlock Text="Run duration (hours)" Style="{StaticResource SettingLabel}"/>
                             <TextBlock Text="Presets start immediately. Hours apply when using Enabled."
                                        Style="{StaticResource SettingHint}"/>
                             <TextBlock Text="{Binding SessionDurationHoursRangeHint}" Style="{StaticResource SettingHint}"/>
                         </StackPanel>
                         <local:NumericStepper Grid.Row="0" Grid.Column="2"
                                               HorizontalAlignment="Left"
-                                              VerticalAlignment="Center"
+                                              VerticalAlignment="Top"
                                               MaxLength="2"
                                               Minimum="{x:Static local:SettingLimits.SessionDurationHoursMin}"
                                               Maximum="{x:Static local:SettingLimits.SessionDurationHoursMax}"
@@ -169,7 +170,7 @@
                         <Grid Grid.Row="1"
                               Grid.Column="2"
                               Width="140"
-                              Margin="0,6,0,0"
+                              Margin="0,10,0,0"
                               HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="32"/>
@@ -258,13 +259,14 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="&#xE74A;" Style="{StaticResource IconGlyph}"/>
+                        <TextBlock Grid.Column="0" Text="&#xE74A;" Style="{StaticResource SettingRowIcon}"/>
                         <TextBlock Grid.Column="1" Text="Minimize to tray" Style="{StaticResource SettingLabel}"/>
                         <Grid Grid.Column="2" Width="140" HorizontalAlignment="Left">
                             <ToggleButton Style="{StaticResource UtilityToggle}"
                                           IsChecked="{Binding MinimizeToTray}"
                                           HorizontalAlignment="Right"
-                                          VerticalAlignment="Center"/>
+                                          VerticalAlignment="Top"
+                                          Margin="0,4,0,0"/>
                         </Grid>
                     </Grid>
                 </Grid>

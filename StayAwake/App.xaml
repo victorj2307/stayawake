@@ -38,21 +38,25 @@
             <Setter Property="Padding" Value="12,10"/>
         </Style>
 
-        <!-- Setting rows -->
+        <!-- Setting rows: margin between rows; controls top-aligned (see SettingRowIcon) -->
         <Style x:Key="SettingRow" TargetType="Grid">
             <Setter Property="Margin" Value="0,0,0,10"/>
-            <Setter Property="Height" Value="36"/>
         </Style>
 
         <Style x:Key="SettingRowLast" TargetType="Grid" BasedOn="{StaticResource SettingRow}">
             <Setter Property="Margin" Value="0"/>
         </Style>
 
+        <Style x:Key="SettingRowIcon" TargetType="TextBlock" BasedOn="{StaticResource IconGlyph}">
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
+        </Style>
+
         <Style x:Key="SettingLabel" TargetType="TextBlock">
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             <Setter Property="Margin" Value="12,0,12,0"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
         </Style>
 
         <Style x:Key="SettingHint" TargetType="TextBlock">
