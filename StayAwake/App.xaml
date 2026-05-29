@@ -396,7 +396,8 @@
                                               ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                               ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
                                               TextElement.Foreground="{TemplateBinding Foreground}"/>
-                            <TextBlock Text="&#xE70D;"
+                            <TextBlock x:Name="Chevron"
+                                       Text="&#xE70D;"
                                        FontFamily="Segoe MDL2 Assets"
                                        FontSize="10"
                                        Foreground="{StaticResource TextSecondary}"
@@ -434,6 +435,10 @@
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.5"/>
+                                <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource InputBgDisabled}"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource BorderDisabled}"/>
+                                <Setter TargetName="Chevron" Property="Foreground" Value="{StaticResource TextMuted}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

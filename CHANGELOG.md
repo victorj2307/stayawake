@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.1
+
+- Fix disabled **Movement direction** combo box styling to match other locked settings (disabled background, border, and muted text)
+
 ## v1.2.0
 
 - Numeric setting ranges shown as muted hints (idle 10–3600 s, movement 1–10 px, run duration 0–99 h)

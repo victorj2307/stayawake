@@ -592,6 +592,10 @@ Prioritized for the **minimalist utility** philosophy. See README roadmap for a 
 | Custom vector icon replacing Flaticon source | Fully owned branding; schedule for v1.2+ |
 | README / social screenshot refresh after icon pass | Keeps marketing aligned with UI |
 
+### Shipped in v1.2.1
+
+- Disabled `UtilityComboBox` visual state aligned with numeric steppers and text fields
+
 ### Shipped in v1.2.0
 
 - `SettingLimits` — shared bounds, UI hints, load-time normalize
@@ -668,4 +672,4 @@ Releases are driven by [`scripts/release.ps1`](../scripts/release.ps1) on Window
 
 ---
 
-*Last updated: v1.2.0 — setting bounds, numeric steppers, keyboard focus, tray-running balloon — .NET 8 / single-project WPF utility.*
+*Last updated: v1.2.1 — disabled combo box styling hotfix — .NET 8 / single-project WPF utility.*
