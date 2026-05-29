@@ -28,6 +28,15 @@ Summary of the first iteration after the stable v1.0.0 release. See [BRANCHING.m
 | **Setting-row layout** | Top-aligned controls; uniform 10px row gaps; run-duration presets directly under stepper |
 | **Docs** | README screenshots regenerated for current UI |
 
+## Planned for v1.2.2
+
+| Initiative | Summary |
+|------------|---------|
+| **Setting icons** | Updated Segoe MDL2 Assets glyphs for each settings row |
+| **Layout** | Enabled toggle on right column above Status; settings-only left column; header divider |
+| **Tab order** | Explicit `TabIndex` 1–11 for keyboard navigation |
+| **Docs** | README screenshots regenerated for updated layout |
+
 ## v1.2+ (optional, not blocking)
 
 | Initiative | Summary |

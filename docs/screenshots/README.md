@@ -2,7 +2,7 @@
 
 Capture guide for README images. Use a **Release** build on Windows with dark theme enabled.
 
-Last full refresh: **v1.2.1** (setting-row spacing, run-duration preset stack under the hours stepper).
+Last full refresh: **v1.2.2** (Enabled toggle moved to right column above Status; settings-only left column).
 
 ## Recommended specs
 
@@ -18,7 +18,7 @@ Last full refresh: **v1.2.1** (setting-row spacing, run-duration preset stack un
 | File | How to capture |
 |------|----------------|
 | `main-active.png` | Enable session, idle 60s, run duration 1h. Status: **Active**, remaining time visible. |
-| `main-disabled.png` | Enabled off. All settings editable. Shows run-duration presets tucked under the hours stepper (v1.2.1 layout). |
+| `main-disabled.png` | Enabled off. All settings editable. **Enabled** toggle in the right column above **Status**; run-duration presets under the hours stepper. |
 | `main-session-completed.png` | Let a short session expire, or use `STAYAWAKE_SCREENSHOT=session-completed` (1s session). Status: **Session completed**; **Session ended** row shows local date and time. |
 | `tray-menu.png` | Right-click tray icon with context menu fully visible. |
 

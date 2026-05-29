@@ -405,11 +405,12 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 
 | Area | Content |
 |------|---------|
-| Header | App icon + title + tagline |
-| Left card | Enabled toggle |
+| Header | App icon + title + tagline; subtle divider below |
 | Left grid | Idle seconds, movement pixels, direction combo, run duration (hours) + quick presets stacked under the stepper in the value column (30m/1h/3h/∞), minimize-to-tray |
-| Right card | Status: state pill + dot, remaining or session ended (label switches), last movement |
+| Right column | Enabled toggle card; Status card (state pill + dot, remaining or session ended, last movement) |
 | Footer | Version string, Reset settings button |
+
+**Tab order (explicit `TabIndex` 1–11):** idle stepper → movement stepper → direction combo → run-duration stepper → preset chips → minimize-to-tray → Enabled → Reset settings. Status is read-only and skipped.
 
 ### Binding strategy
 
@@ -674,4 +675,4 @@ Releases are driven by [`scripts/release.ps1`](../scripts/release.ps1) on Window
 
 ---
 
-*Last updated: v1.2.1 — combo disabled styling, setting-row spacing, screenshot refresh — .NET 8 / single-project WPF utility.*
+*Last updated: v1.2.2 — layout relocation, Tab order, setting icons, screenshot refresh — .NET 8 / single-project WPF utility.*

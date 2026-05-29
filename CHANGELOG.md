@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.2
+
+- New icons for settings rows (Segoe MDL2 Assets glyphs in the main window)
+- Header separator line between title area and settings
+- Relocate **Enabled** toggle to the right column above **Status**; settings-only left column
+- Explicit Tab order for keyboard navigation (settings → Enabled → Reset settings)
+- README screenshots refreshed for the updated layout
+
 ## v1.2.1
 
 - Fix disabled **Movement direction** combo box styling to match other locked settings (disabled background, border, and muted text)

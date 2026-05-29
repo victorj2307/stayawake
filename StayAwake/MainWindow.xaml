@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
@@ -46,8 +47,13 @@
             </StackPanel>
         </Grid>
 
+        <Border Grid.Row="1"
+                Height="1"
+                Background="{StaticResource BorderSubtle}"
+                Margin="0,0,0,10"/>
+
         <!-- Content -->
-        <Grid Grid.Row="1" VerticalAlignment="Top">
+        <Grid Grid.Row="2" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="12"/>
@@ -55,26 +61,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Main settings -->
-            <Grid Grid.Column="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <Border Grid.Row="0" Style="{StaticResource CardBorder}" Margin="0,0,0,10" Padding="12,8">
-                    <Grid Height="36">
-                        <TextBlock Text="Enabled"
-                                   FontSize="14"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"/>
-                        <ToggleButton Style="{StaticResource UtilityToggleLarge}"
-                                      IsChecked="{Binding Enabled}"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Center"/>
-                    </Grid>
-                </Border>
-
-                <Grid Grid.Row="1" IsEnabled="{Binding CanEditSettings}">
+            <Grid Grid.Column="0" IsEnabled="{Binding CanEditSettings}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -96,6 +83,7 @@
                         </StackPanel>
                         <local:NumericStepper Grid.Column="2"
                                               VerticalAlignment="Top"
+                                              StepperTabIndex="1"
                                               MaxLength="4"
                                               Minimum="{x:Static local:SettingLimits.IdleSecondsMin}"
                                               Maximum="{x:Static local:SettingLimits.IdleSecondsMax}"
@@ -117,6 +105,7 @@
                         </StackPanel>
                         <local:NumericStepper Grid.Column="2"
                                               VerticalAlignment="Top"
+                                              StepperTabIndex="2"
                                               MaxLength="2"
                                               Minimum="{x:Static local:SettingLimits.MovementPixelsMin}"
                                               Maximum="{x:Static local:SettingLimits.MovementPixelsMax}"
@@ -131,10 +120,11 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="&#xE8B8;" Style="{StaticResource SettingRowIcon}"/>
+                        <TextBlock Grid.Column="0" Text="&#xE759;" Style="{StaticResource SettingRowIcon}"/>
                         <TextBlock Grid.Column="1" Text="Movement direction" Style="{StaticResource SettingLabel}"/>
                         <ComboBox Grid.Column="2"
                                   VerticalAlignment="Top"
+                                  KeyboardNavigation.TabIndex="3"
                                   Style="{StaticResource UtilityComboBox}"
                                   ItemContainerStyle="{StaticResource UtilityComboBoxItem}"
                                   ItemsSource="{Binding MovementModes}"
@@ -147,18 +137,19 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="&#xE823;" Style="{StaticResource SettingRowIcon}"/>
+                        <TextBlock Grid.Column="0" Text="&#xECC5;" Style="{StaticResource SettingRowIcon}"/>
                         <StackPanel Grid.Column="1" VerticalAlignment="Top">
                             <TextBlock Text="Run duration (hours)" Style="{StaticResource SettingLabel}"/>
+                            <TextBlock Text="{Binding SessionDurationHoursRangeHint}" Style="{StaticResource SettingHint}"/>
                             <TextBlock Text="Presets start immediately. Hours apply when using Enabled."
                                        Style="{StaticResource SettingHint}"/>
-                            <TextBlock Text="{Binding SessionDurationHoursRangeHint}" Style="{StaticResource SettingHint}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2"
                                     Width="140"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top">
-                            <local:NumericStepper MaxLength="2"
+                            <local:NumericStepper StepperTabIndex="4"
+                                                  MaxLength="2"
                                                   Minimum="{x:Static local:SettingLimits.SessionDurationHoursMin}"
                                                   Maximum="{x:Static local:SettingLimits.SessionDurationHoursMax}"
                                                   Step="{x:Static local:SettingLimits.SessionDurationHoursStep}"
@@ -176,6 +167,7 @@
                             </Grid.ColumnDefinitions>
                             <Button Grid.Column="0"
                                     Content="30m"
+                                    KeyboardNavigation.TabIndex="5"
                                     Command="{Binding StartPreset30mCommand}"
                                     HorizontalAlignment="Stretch">
                                 <Button.Style>
@@ -193,6 +185,7 @@
                             </Button>
                             <Button Grid.Column="2"
                                     Content="1h"
+                                    KeyboardNavigation.TabIndex="6"
                                     Command="{Binding StartPreset1hCommand}"
                                     HorizontalAlignment="Stretch">
                                 <Button.Style>
@@ -210,6 +203,7 @@
                             </Button>
                             <Button Grid.Column="4"
                                     Content="3h"
+                                    KeyboardNavigation.TabIndex="7"
                                     Command="{Binding StartPreset3hCommand}"
                                     HorizontalAlignment="Stretch">
                                 <Button.Style>
@@ -227,6 +221,7 @@
                             </Button>
                             <Button Grid.Column="6"
                                     Content="&#x221E;"
+                                    KeyboardNavigation.TabIndex="8"
                                     Command="{Binding StartPresetIndefiniteCommand}"
                                     ToolTip="Indefinite"
                                     HorizontalAlignment="Stretch">
@@ -253,21 +248,36 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="&#xE74A;" Style="{StaticResource SettingRowIcon}"/>
+                        <TextBlock Grid.Column="0" Text="&#xE741;" Style="{StaticResource SettingRowIcon}"/>
                         <TextBlock Grid.Column="1" Text="Minimize to tray" Style="{StaticResource SettingLabel}"/>
                         <Grid Grid.Column="2" Width="140" HorizontalAlignment="Left">
                             <ToggleButton Style="{StaticResource UtilityToggle}"
                                           IsChecked="{Binding MinimizeToTray}"
+                                          KeyboardNavigation.TabIndex="9"
                                           HorizontalAlignment="Right"
                                           VerticalAlignment="Top"
                                           Margin="0,4,0,0"/>
                         </Grid>
                     </Grid>
-                </Grid>
             </Grid>
 
-            <!-- Status -->
-            <Border Grid.Column="2" Style="{StaticResource CardBorder}" Padding="10,10" VerticalAlignment="Top">
+            <!-- Enabled + Status -->
+            <StackPanel Grid.Column="2" VerticalAlignment="Top">
+                <Border Style="{StaticResource CardBorder}" Padding="12,8">
+                    <Grid Height="36">
+                        <TextBlock Text="Enabled"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                        <ToggleButton Style="{StaticResource UtilityToggleLarge}"
+                                      IsChecked="{Binding Enabled}"
+                                      KeyboardNavigation.TabIndex="10"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource CardBorder}" Padding="10,10" Margin="0,10,0,0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -327,11 +337,12 @@
                                Text="{Binding LastMovementValue}"
                                Style="{StaticResource StatusValue}"/>
                 </Grid>
-            </Border>
+                </Border>
+            </StackPanel>
         </Grid>
 
         <!-- Footer -->
-        <Grid Grid.Row="2" Margin="0,10,0,0">
+        <Grid Grid.Row="3" Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -342,6 +353,7 @@
                        VerticalAlignment="Center"/>
             <Button Grid.Column="1"
                     Content="Reset settings"
+                    KeyboardNavigation.TabIndex="11"
                     Style="{StaticResource FooterResetButton}"
                     Command="{Binding ResetSettingsCommand}"/>
         </Grid>

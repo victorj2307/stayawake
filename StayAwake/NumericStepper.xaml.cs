@@ -31,6 +31,13 @@ public partial class NumericStepper : System.Windows.Controls.UserControl
             typeof(NumericStepper),
             new PropertyMetadata(4, OnMaxLengthChanged));
 
+    public static readonly DependencyProperty StepperTabIndexProperty =
+        DependencyProperty.Register(
+            nameof(StepperTabIndex),
+            typeof(int),
+            typeof(NumericStepper),
+            new PropertyMetadata(0, OnStepperTabIndexChanged));
+
     public NumericStepper()
     {
         InitializeComponent();
@@ -66,10 +73,22 @@ public partial class NumericStepper : System.Windows.Controls.UserControl
         set => SetValue(MaxLengthProperty, value);
     }
 
+    public int StepperTabIndex
+    {
+        get => (int)GetValue(StepperTabIndexProperty);
+        set => SetValue(StepperTabIndexProperty, value);
+    }
+
     private static void OnMaxLengthChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is NumericStepper stepper)
             stepper.PART_TextBox.MaxLength = (int)e.NewValue;
+    }
+
+    private static void OnStepperTabIndexChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is NumericStepper stepper)
+            KeyboardNavigation.SetTabIndex(stepper.PART_TextBox, (int)e.NewValue);
     }
 
     private void StepUpButton_Click(object sender, RoutedEventArgs e) => ApplyStep(+1);
