@@ -160,7 +160,7 @@ After v1.0.0, day-to-day work happens on **`develop`**; releases merge into **`m
 | `-DryRun` | Print steps without publish, commit, tag, push, or `gh release` |
 | `-SkipPush` | Publish and zip to `dist/` only (no git or GitHub steps) |
 
-**Prerequisites for a full release:** Windows, .NET 8 SDK, authenticated `gh`, clean working tree on `main`, push access to `origin`.
+**Prerequisites for a full release:** Windows, .NET 8 SDK, authenticated `gh`, clean working tree on **`main`** (the script **refuses** other branches), local `main` matches `origin/main`, push access to `origin`.
 
 **Release asset:** `dist/StayAwake-v{version}-win-x64.zip` containing **only** `StayAwake.exe` (icons embedded in the assembly). The `dist/` folder is gitignored.
 
@@ -189,6 +189,8 @@ To fix an **already published** release, edit it on GitHub or use `gh release ed
 | `gh` not found | Install GitHub CLI and open a new terminal, or verify `C:\Program Files\GitHub CLI\gh.exe` exists |
 | `gh is not authenticated` | Run `gh auth login` |
 | Tag already exists | Use a new `-Version`, or delete the tag on GitHub if the release was a mistake |
+| Released from `develop` by mistake | Merge `develop` → `main` and push; the tag still points at the same commit. Future releases must run on `main` (enforced by the script) |
+| `Releases must be cut from branch 'main'` | `git checkout main`, merge `develop`, push, then rerun `release.ps1` |
 | Push succeeded but `gh release create` failed | Create the release manually: `gh release create v1.1.0 dist/StayAwake-v1.1.0-win-x64.zip --title "StayAwake v1.1.0"` |
 
 See [docs/ARCHITECTURE.md §16](docs/ARCHITECTURE.md#16-release-automation) for a short technical summary.

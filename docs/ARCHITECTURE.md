@@ -670,7 +670,7 @@ Releases are driven by [`scripts/release.ps1`](../scripts/release.ps1) on Window
 5. Commit csproj only if the version changed; create annotated tag `v{version}`; push branch and tag to `origin`.
 6. `gh release create` with the zip attached; body rendered from [`scripts/GITHUB_RELEASE_NOTES.md`](../scripts/GITHUB_RELEASE_NOTES.md) (`{{TAG}}`, `{{ZIP_NAME}}`, `{{CHANGELOG_LINE}}`, etc.).
 
-**Related implementation details:** tray icons are embedded WPF resources ([§10](#10-tray-integration)); publish output should not include an `Assets\` folder beside the EXE. Merge `develop` → `main` before running the script ([BRANCHING.md](BRANCHING.md)).
+**Related implementation details:** tray icons are embedded WPF resources ([§10](#10-tray-integration)); publish output should not include an `Assets\` folder beside the EXE. Merge `develop` → `main` before running the script ([BRANCHING.md](BRANCHING.md)). The script refuses to run off `main` or when `main` ≠ `origin/main`.
 
 ---
 

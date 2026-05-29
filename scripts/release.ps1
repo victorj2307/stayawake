@@ -197,7 +197,35 @@ try {
 
     $branch = git rev-parse --abbrev-ref HEAD
     if ($branch -ne 'main') {
-        Write-Warning "Current branch is '$branch', not 'main'."
+        throw @"
+Releases must be cut from branch 'main' (current: '$branch').
+Merge develop into main first:
+  git checkout main
+  git pull origin main
+  git merge develop
+  git push origin main
+Then run release.ps1 from main. See docs/BRANCHING.md.
+"@
+    }
+
+    if (-not $SkipPush) {
+        git fetch origin main 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw 'git fetch origin main failed. Check network and remote.'
+        }
+        $localMain = git rev-parse HEAD
+        $remoteMain = git rev-parse origin/main 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not resolve origin/main. Push main to origin before releasing.'
+        }
+        if ($localMain -ne $remoteMain) {
+            $ahead = (git rev-list --count origin/main..HEAD)
+            $behind = (git rev-list --count HEAD..origin/main)
+            throw @"
+main is not in sync with origin/main (ahead $ahead, behind $behind).
+Push or pull so local main matches origin/main before releasing.
+"@
+        }
     }
 
     $currentVersion = Get-ProjectVersion

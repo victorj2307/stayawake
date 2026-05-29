@@ -40,7 +40,7 @@ Example for **v1.1.0**:
 5. From repo root on `main` with a **clean** tree: `.\scripts\release.ps1 -Version 1.1.0`
 6. `git checkout develop` → `git merge main` (sync any release-only commits) → `git push origin develop`
 
-Tags and GitHub Releases are created on **`main`** only (`v1.1.0`, etc.).
+Tags and GitHub Releases are created on **`main`** only (`v1.1.0`, etc.). `release.ps1` **errors** if you are not on `main` or if `main` is out of sync with `origin/main`.
 
 ## What we do not use
 
