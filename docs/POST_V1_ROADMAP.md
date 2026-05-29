@@ -20,6 +20,14 @@ Summary of the first iteration after the stable v1.0.0 release. See [BRANCHING.m
 | **Setting bounds** | `SettingLimits`, muted range hints, digits/max-length guards, normalize on load, `NumericStepper` (buttons, Up/Down, mouse wheel), Tab focus styling |
 | **Tray-running balloon** | Notify when session starts with minimize-to-tray or window hides to tray (15 s cooldown) |
 
+## Shipped in v1.2.1
+
+| Initiative | Summary |
+|------------|---------|
+| **Disabled combo styling** | `UtilityComboBox` disabled state matches other locked inputs |
+| **Setting-row layout** | Top-aligned controls; uniform 10px row gaps; run-duration presets directly under stepper |
+| **Docs** | README screenshots regenerated for current UI |
+
 ## v1.2+ (optional, not blocking)
 
 | Initiative | Summary |

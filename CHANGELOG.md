@@ -4,6 +4,7 @@
 
 - Fix disabled **Movement direction** combo box styling to match other locked settings (disabled background, border, and muted text)
 - Consistent vertical spacing between setting rows (top-aligned inputs; uniform row gaps; presets sit directly under the run-duration stepper)
+- README screenshots refreshed for the updated settings layout
 
 ## v1.2.0
 

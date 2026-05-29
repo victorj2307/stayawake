@@ -407,7 +407,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 |------|---------|
 | Header | App icon + title + tagline |
 | Left card | Enabled toggle |
-| Left grid | Idle seconds, movement pixels, direction combo, run duration (hours) + quick presets (30m/1h/3h/∞), minimize-to-tray |
+| Left grid | Idle seconds, movement pixels, direction combo, run duration (hours) + quick presets stacked under the stepper in the value column (30m/1h/3h/∞), minimize-to-tray |
 | Right card | Status: state pill + dot, remaining or session ended (label switches), last movement |
 | Footer | Version string, Reset settings button |
 
@@ -595,6 +595,8 @@ Prioritized for the **minimalist utility** philosophy. See README roadmap for a 
 ### Shipped in v1.2.1
 
 - Disabled `UtilityComboBox` visual state aligned with numeric steppers and text fields
+- Consistent setting-row spacing: `SettingRow` margin only; `SettingRowIcon` + top-aligned inputs; run-duration presets in a column `StackPanel` (no dead space under the stepper)
+- README screenshots refreshed (`docs/screenshots/`)
 
 ### Shipped in v1.2.0
 
@@ -672,4 +674,4 @@ Releases are driven by [`scripts/release.ps1`](../scripts/release.ps1) on Window
 
 ---
 
-*Last updated: v1.2.1 — disabled combo box styling hotfix — .NET 8 / single-project WPF utility.*
+*Last updated: v1.2.1 — combo disabled styling, setting-row spacing, screenshot refresh — .NET 8 / single-project WPF utility.*
