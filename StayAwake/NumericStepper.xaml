@@ -5,54 +5,59 @@
              Height="36"
              Focusable="False"
              PreviewMouseWheel="NumericStepper_PreviewMouseWheel">
-    <Border x:Name="OuterBorder"
+    <Border CornerRadius="7"
+            BorderBrush="{StaticResource InputInsetOuter}"
             BorderThickness="1"
-            CornerRadius="6">
-        <Border.Style>
-            <Style TargetType="Border">
-                <Setter Property="Background" Value="{StaticResource InputBg}"/>
-                <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding ElementName=PART_TextBox, Path=IsKeyboardFocused}" Value="True">
-                        <Setter Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
-                        <Setter Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
-                        <Setter Property="Background" Value="{StaticResource InputBgDisabled}"/>
-                        <Setter Property="BorderBrush" Value="{StaticResource BorderDisabled}"/>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="28"/>
-            </Grid.ColumnDefinitions>
-            <TextBox x:Name="PART_TextBox"
-                     Grid.Column="0"
-                     Style="{StaticResource UtilityNumericStepperTextBox}"
-                     MaxLength="{Binding MaxLength, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                     Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     PreviewTextInput="PART_TextBox_PreviewTextInput"
-                     PreviewKeyDown="PART_TextBox_PreviewKeyDown"/>
-            <Grid Grid.Column="1" Margin="0,1,1,1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <RepeatButton Grid.Row="0"
-                              Style="{StaticResource UtilityStepperButton}"
-                              Content="&#xE70E;"
-                              Click="StepUpButton_Click"/>
-                <RepeatButton Grid.Row="1"
-                              Style="{StaticResource UtilityStepperButton}"
-                              Content="&#xE70D;"
-                              Click="StepDownButton_Click"/>
+            Background="{StaticResource InputInsetFrame}">
+        <Border x:Name="OuterBorder"
+                BorderThickness="1"
+                CornerRadius="6">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="Background" Value="{StaticResource InputBg}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource InputBorderInset}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=PART_TextBox, Path=IsKeyboardFocused}" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsKeyboardFocusWithin, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsEnabled, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
+                            <Setter Property="Background" Value="{StaticResource InputBgDisabled}"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource BorderDisabled}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="28"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="PART_TextBox"
+                         Grid.Column="0"
+                         Style="{StaticResource UtilityNumericStepperTextBox}"
+                         MaxLength="{Binding MaxLength, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                         Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         PreviewTextInput="PART_TextBox_PreviewTextInput"
+                         PreviewKeyDown="PART_TextBox_PreviewKeyDown"/>
+                <Grid Grid.Column="1" Margin="0,1,1,1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <RepeatButton Grid.Row="0"
+                                  Style="{StaticResource UtilityStepperButton}"
+                                  Content="&#xE70E;"
+                                  Click="StepUpButton_Click"/>
+                    <RepeatButton Grid.Row="1"
+                                  Style="{StaticResource UtilityStepperButton}"
+                                  Content="&#xE70D;"
+                                  Click="StepDownButton_Click"/>
+                </Grid>
             </Grid>
-        </Grid>
+        </Border>
     </Border>
     <UserControl.Style>
         <Style TargetType="UserControl">

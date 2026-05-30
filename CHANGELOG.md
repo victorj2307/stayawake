@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.3
+
+- UI redesign: purple/navy theme with radial background glow, gradient header divider, and card elevation shadows
+- Purple primary accent on toggles, focus rings, setting-row icons, and selected duration presets; green accent reserved for status (header, remaining time, active dot)
+- Inset styling on numeric steppers, combo box, and text inputs for recessed field depth
+- Reset settings button shows a purple refresh icon beside the label
+- README screenshots refreshed for the updated theme
+
 ## v1.2.2
 
 - New icons for settings rows (Segoe MDL2 Assets glyphs in the main window)

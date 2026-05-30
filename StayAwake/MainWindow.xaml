@@ -9,11 +9,47 @@
         MaxHeight="604"
         MinWidth="600"
         ResizeMode="CanMinimize"
-        Background="{StaticResource WindowBg}"
+        Background="{StaticResource WindowBgBase}"
         Foreground="{StaticResource TextPrimary}"
         FontFamily="Segoe UI"
         WindowStartupLocation="CenterScreen">
-    <Grid Margin="14">
+    <Grid>
+        <Grid IsHitTestVisible="False">
+            <Ellipse HorizontalAlignment="Left"
+                     VerticalAlignment="Top"
+                     Width="520"
+                     Height="380"
+                     Margin="-70,-55,0,0">
+                <Ellipse.Fill>
+                    <RadialGradientBrush GradientOrigin="0.35,0.35"
+                                         Center="0.35,0.35"
+                                         RadiusX="0.75"
+                                         RadiusY="0.75">
+                        <GradientStop Color="#55402858" Offset="0"/>
+                        <GradientStop Color="#30181030" Offset="0.55"/>
+                        <GradientStop Color="#0007070F" Offset="1"/>
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+            <Ellipse HorizontalAlignment="Left"
+                     VerticalAlignment="Top"
+                     Width="360"
+                     Height="280"
+                     Margin="120,30,0,0"
+                     Opacity="0.65">
+                <Ellipse.Fill>
+                    <RadialGradientBrush GradientOrigin="0.4,0.4"
+                                         Center="0.4,0.4"
+                                         RadiusX="0.7"
+                                         RadiusY="0.7">
+                        <GradientStop Color="#35183858" Offset="0"/>
+                        <GradientStop Color="#0007070F" Offset="1"/>
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+        </Grid>
+
+        <Grid Margin="14">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -27,7 +63,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image Width="36" Height="36"
+            <Image Width="44" Height="44"
                    Margin="0,0,12,0"
                    VerticalAlignment="Center"
                    RenderOptions.BitmapScalingMode="HighQuality">
@@ -49,7 +85,7 @@
 
         <Border Grid.Row="1"
                 Height="1"
-                Background="{StaticResource BorderSubtle}"
+                Background="{StaticResource AccentGradient}"
                 Margin="0,0,0,10"/>
 
         <!-- Content -->
@@ -178,6 +214,7 @@
                                             <DataTrigger Binding="{Binding IsPreset30mPreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                                 <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderActive}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -196,6 +233,7 @@
                                             <DataTrigger Binding="{Binding IsPreset1hPreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                                 <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderActive}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -214,6 +252,7 @@
                                             <DataTrigger Binding="{Binding IsPreset3hPreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                                 <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderActive}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -233,6 +272,7 @@
                                             <DataTrigger Binding="{Binding IsPresetIndefinitePreferred}" Value="True">
                                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                                                 <Setter Property="Background" Value="{StaticResource PresetBgPreferred}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource PresetBorderActive}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -352,10 +392,21 @@
                        Foreground="{StaticResource TextMuted}"
                        VerticalAlignment="Center"/>
             <Button Grid.Column="1"
-                    Content="Reset settings"
                     KeyboardNavigation.TabIndex="11"
                     Style="{StaticResource FooterResetButton}"
-                    Command="{Binding ResetSettingsCommand}"/>
+                    Command="{Binding ResetSettingsCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE777;"
+                               FontFamily="Segoe MDL2 Assets"
+                               FontSize="12"
+                               Foreground="{StaticResource AccentPrimary}"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="Reset settings"
+                               Margin="6,0,0,0"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </Grid>
+    </Grid>
     </Grid>
 </Window>

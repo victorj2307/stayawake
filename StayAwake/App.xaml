@@ -4,43 +4,62 @@
              xmlns:local="clr-namespace:StayAwake">
     <Application.Resources>
         <!-- Palette -->
-        <SolidColorBrush x:Key="WindowBg" Color="#141414"/>
-        <SolidColorBrush x:Key="CardBg" Color="#1C1C1C"/>
-        <SolidColorBrush x:Key="InputBg" Color="#252526"/>
-        <SolidColorBrush x:Key="InputBgDisabled" Color="#1A1A1A"/>
-        <SolidColorBrush x:Key="BorderSubtle" Color="#333333"/>
-        <SolidColorBrush x:Key="BorderDisabled" Color="#2A2A2A"/>
+        <SolidColorBrush x:Key="WindowBgBase" Color="#07070F"/>
+        <SolidColorBrush x:Key="CardBg" Color="#1A1A2C"/>
+        <SolidColorBrush x:Key="InputBg" Color="#1E1E2E"/>
+        <SolidColorBrush x:Key="InputBgDisabled" Color="#161622"/>
+        <SolidColorBrush x:Key="InputHoverBg" Color="#2A2A40"/>
+        <SolidColorBrush x:Key="InputInsetOuter" Color="#06060C"/>
+        <SolidColorBrush x:Key="InputInsetFrame" Color="#101018"/>
+        <SolidColorBrush x:Key="InputBorderInset" Color="#252538"/>
+        <SolidColorBrush x:Key="BorderSubtle" Color="#32324A"/>
+        <SolidColorBrush x:Key="BorderDisabled" Color="#282838"/>
+        <SolidColorBrush x:Key="CardBorderLight" Color="#30FFFFFF"/>
         <SolidColorBrush x:Key="TextPrimary" Color="#F3F3F3"/>
         <SolidColorBrush x:Key="TextSecondary" Color="#A0A0A0"/>
         <SolidColorBrush x:Key="TextMuted" Color="#666666"/>
+        <SolidColorBrush x:Key="AccentPrimary" Color="#A855F7"/>
+        <SolidColorBrush x:Key="AccentPrimaryDim" Color="#2D1F4A"/>
+        <LinearGradientBrush x:Key="AccentGradient" StartPoint="0,0.5" EndPoint="1,0.5">
+            <GradientStop Color="#A855F7" Offset="0"/>
+            <GradientStop Color="#3B82F6" Offset="1"/>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="IconAccent" Color="#A855F7"/>
+        <SolidColorBrush x:Key="PresetBorderActive" Color="#A855F7"/>
         <SolidColorBrush x:Key="AccentGreen" Color="#3DD68C"/>
-        <SolidColorBrush x:Key="AccentGreenDim" Color="#1A3D2E"/>
         <SolidColorBrush x:Key="StatusDisabled" Color="#8A8A8A"/>
         <SolidColorBrush x:Key="StatusCompleted" Color="#7EB8DA"/>
-        <SolidColorBrush x:Key="ToggleTrackOff" Color="#2E2E2E"/>
-        <SolidColorBrush x:Key="ToggleTrackBorder" Color="#404040"/>
+        <SolidColorBrush x:Key="ToggleTrackOff" Color="#2E2E3A"/>
+        <SolidColorBrush x:Key="ToggleTrackBorder" Color="#4A4A60"/>
         <SolidColorBrush x:Key="ToggleThumb" Color="#F0F0F0"/>
-        <SolidColorBrush x:Key="PresetBorderPreferred" Color="#4A4A4A"/>
-        <SolidColorBrush x:Key="PresetBgPreferred" Color="#2A2A2A"/>
-        <SolidColorBrush x:Key="PresetAccentHint" Color="#5A6A72"/>
+        <SolidColorBrush x:Key="PresetBorderPreferred" Color="#4A4A60"/>
+        <SolidColorBrush x:Key="PresetBgPreferred" Color="#2A2A3A"/>
+
+        <DropShadowEffect x:Key="CardElevation"
+                          BlurRadius="22"
+                          ShadowDepth="3"
+                          Direction="270"
+                          Opacity="0.42"
+                          Color="#000000"/>
 
         <!-- Override system highlight colors for ComboBox dropdown -->
-        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#1A3D2E"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#2D1F4A"/>
         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#F3F3F3"/>
-        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#1C1C1C"/>
+        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#1A1A28"/>
 
         <!-- Card -->
         <Style x:Key="CardBorder" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource CardBg}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource CardBorderLight}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="14,12"/>
+            <Setter Property="Effect" Value="{StaticResource CardElevation}"/>
         </Style>
 
         <!-- Setting rows: margin between rows; controls top-aligned (see SettingRowIcon) -->
         <Style x:Key="SettingRow" TargetType="Grid">
-            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
         </Style>
 
         <Style x:Key="SettingRowLast" TargetType="Grid" BasedOn="{StaticResource SettingRow}">
@@ -90,7 +109,7 @@
         <Style x:Key="IconGlyph" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
             <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="Foreground" Value="{StaticResource IconAccent}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
@@ -139,11 +158,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Track" Property="Background" Value="{StaticResource AccentGreen}"/>
-                                <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Track" Property="Background" Value="{StaticResource AccentGradient}"/>
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                                 <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right"/>
                                 <Setter TargetName="Thumb" Property="Margin" Value="0,0,2,0"/>
                             </Trigger>
@@ -180,11 +199,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Track" Property="Background" Value="{StaticResource AccentGreen}"/>
-                                <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Track" Property="Background" Value="{StaticResource AccentGradient}"/>
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                                 <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right"/>
                                 <Setter TargetName="Thumb" Property="Margin" Value="0,0,3,0"/>
                             </Trigger>
@@ -215,20 +234,26 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border x:Name="Bd"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}"
-                                          VerticalAlignment="Center"
-                                          HorizontalScrollBarVisibility="Hidden"
-                                          VerticalScrollBarVisibility="Hidden"/>
+                        <Border x:Name="InsetFrame"
+                                CornerRadius="7"
+                                BorderBrush="{StaticResource InputInsetOuter}"
+                                BorderThickness="1"
+                                Background="{StaticResource InputInsetFrame}">
+                            <Border x:Name="Bd"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{StaticResource InputBorderInset}"
+                                    BorderThickness="1"
+                                    CornerRadius="6">
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
+                                              HorizontalScrollBarVisibility="Hidden"
+                                              VerticalScrollBarVisibility="Hidden"/>
+                            </Border>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.5"/>
@@ -298,11 +323,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#333333"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource InputHoverBg}"/>
                                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#3A3A3A"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource InputBg}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.45"/>
@@ -339,7 +364,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource PresetBorderPreferred}"/>
@@ -373,12 +398,17 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
-                        <Grid SnapsToDevicePixels="True">
-                            <Border x:Name="Border"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="6"/>
+                        <Border x:Name="InsetFrame"
+                                CornerRadius="7"
+                                BorderBrush="{StaticResource InputInsetOuter}"
+                                BorderThickness="1"
+                                Background="{StaticResource InputInsetFrame}">
+                            <Grid SnapsToDevicePixels="True">
+                                <Border x:Name="Border"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{StaticResource InputBorderInset}"
+                                        BorderThickness="1"
+                                        CornerRadius="6"/>
                             <ToggleButton x:Name="ToggleButton"
                                           Focusable="False"
                                           IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
@@ -426,16 +456,17 @@
                                     </ScrollViewer>
                                 </Border>
                             </Popup>
-                        </Grid>
+                            </Grid>
+                        </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsDropDownOpen" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.5"/>
@@ -466,8 +497,8 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsHighlighted" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentGreenDim}"/>
-                                <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource AccentPrimaryDim}"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{StaticResource InputBg}"/>
@@ -508,7 +539,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentGreen}"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource AccentPrimary}"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="{StaticResource InputBg}"/>
