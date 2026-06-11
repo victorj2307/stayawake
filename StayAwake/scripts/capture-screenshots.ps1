@@ -14,7 +14,7 @@ dotnet run --project $toolProject -c Release -- $root
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host 'Regenerating tray-menu.png...'
-python (Join-Path $PSScriptRoot 'generate-tray-menu-screenshot.py')
+py (Join-Path $PSScriptRoot 'generate-tray-menu-screenshot.py')
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host 'Done.'

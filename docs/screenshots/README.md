@@ -2,7 +2,7 @@
 
 Capture guide for README images. Use a **Release** build on Windows with dark theme enabled.
 
-Last full refresh: **v1.2.2** (Enabled toggle moved to right column above Status; settings-only left column).
+Last full refresh: **v1.2.3** (purple/navy UI theme, radial background glow, card shadows, inset inputs).
 
 ## Recommended specs
 

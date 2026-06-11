@@ -28,7 +28,7 @@ Summary of the first iteration after the stable v1.0.0 release. See [BRANCHING.m
 | **Setting-row layout** | Top-aligned controls; uniform 10px row gaps; run-duration presets directly under stepper |
 | **Docs** | README screenshots regenerated for current UI |
 
-## Planned for v1.2.2
+## Shipped in v1.2.2
 
 | Initiative | Summary |
 |------------|---------|
@@ -36,6 +36,14 @@ Summary of the first iteration after the stable v1.0.0 release. See [BRANCHING.m
 | **Layout** | Enabled toggle on right column above Status; settings-only left column; header divider |
 | **Tab order** | Explicit `TabIndex` 1–11 for keyboard navigation |
 | **Docs** | README screenshots regenerated for updated layout |
+
+## Shipped in v1.2.3
+
+| Initiative | Summary |
+|------------|---------|
+| **UI theme** | Purple/navy redesign: radial background glow, gradient divider, card elevation shadows, inset inputs |
+| **Accents** | Purple primary on toggles, focus, icons, presets; green reserved for status section |
+| **Docs** | README screenshots and architecture docs updated for the new theme |
 
 ## v1.2+ (optional, not blocking)
 

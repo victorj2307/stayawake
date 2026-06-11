@@ -266,11 +266,11 @@ For state diagrams, worker loop pseudocode, Win32 details, and threading notes, 
 ## UI philosophy
 
 - **Compact utility** — one screen, no tabs or dashboards.
-- **Dark theme** — low-contrast grays and green accent; Segoe MDL2 icons for settings rows.
+- **Dark theme** — purple/navy gradient background with radial glow; purple accent on interactive controls; green accent on status; Segoe MDL2 icons for settings rows.
 - **Status sidebar** — state, remaining time (or session ended date/time when completed), last movement—no log viewer.
 - **Session-oriented workflow** — enable = start a session; configure duration and idle rules before or between sessions.
 - **Bounded numeric inputs** — muted range hints, clamp on blur, and `NumericStepper` controls for the three numeric settings.
-- **Keyboard-friendly** — Tab through all controls; focused fields show a green border (matches the dark theme, no dashed system focus rectangle).
+- **Keyboard-friendly** — Tab through all controls; focused fields show a purple border (matches the dark theme, no dashed system focus rectangle).
 
 ---
 

@@ -396,8 +396,9 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 ### Philosophy
 
 - **Compact utility:** one window, no navigation, no dashboard.
-- **Dark theme:** `#141414` window background, card-based layout, custom toggle/combo/textbox styles in `App.xaml`.
-- **Keyboard focus:** custom templates use an `AccentGreen` border on `IsKeyboardFocused` (and `IsKeyboardFocusWithin` / `IsDropDownOpen` where needed); default `FocusVisualStyle` is disabled so Tab navigation matches mouse focus on inputs.
+- **Dark theme:** layered purple/navy background (radial glow from top-left), card-based layout with elevation shadows, inset input chrome, custom toggle/combo/textbox styles in `App.xaml`.
+- **Keyboard focus:** custom templates use an `AccentPrimary` (purple) border on `IsKeyboardFocused` (and `IsKeyboardFocusWithin` / `IsDropDownOpen` where needed); default `FocusVisualStyle` is disabled so Tab navigation matches mouse focus on inputs.
+- **Status accent:** `AccentGreen` is reserved for the status card (header, remaining countdown, active dot)—not used for general interactive focus.
 - **Session-oriented:** master "Enabled" toggle starts a session; settings lock while active.
 - **Status at a glance:** right column shows state, remaining time (or session ended date/time when completed), last movement time.
 
@@ -405,7 +406,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 
 | Area | Content |
 |------|---------|
-| Header | App icon + title + tagline; subtle divider below |
+| Header | App icon + title + tagline; purple-to-blue gradient divider below |
 | Left grid | Idle seconds, movement pixels, direction combo, run duration (hours) + quick presets stacked under the stepper in the value column (30m/1h/3h/∞), minimize-to-tray |
 | Right column | Enabled toggle card; Status card (state pill + dot, remaining or session ended, last movement) |
 | Footer | Version string, Reset settings button |
@@ -429,17 +430,27 @@ All tab stops in the settings UI share the same visible focus treatment:
 
 | Control | Style key | Focus indicator |
 |---------|-----------|-----------------|
-| Enabled / Minimize to tray | `UtilityToggleLarge` / `UtilityToggle` | Green border on switch track |
-| Numeric fields | `NumericStepper` | Green border on outer composite (`PART_TextBox.IsKeyboardFocused`; border colors live in `Border.Style` setters, not local values, so triggers apply) |
-| Movement direction | `UtilityComboBox` | Green border when focused, focus-within, or dropdown open |
-| Duration presets | `UtilityPresetChip` | Green border on chip; preferred state no longer overrides border so focus stays visible |
-| Reset settings | `FooterResetButton` | Green border on button |
+| Enabled / Minimize to tray | `UtilityToggleLarge` / `UtilityToggle` | Purple border on switch track; checked track uses `AccentGradient` (large) or `AccentPrimary` (small) |
+| Numeric fields | `NumericStepper` | Purple border on inner field (`PART_TextBox.IsKeyboardFocused`; inset outer frame via `InputInsetOuter` / `InputInsetFrame`) |
+| Movement direction | `UtilityComboBox` | Purple border when focused, focus-within, or dropdown open |
+| Duration presets | `UtilityPresetChip` | Purple border on chip; preferred state adds `PresetBorderActive` outline |
+| Reset settings | `FooterResetButton` | Purple border on button; MDL2 refresh glyph in `AccentPrimary` |
 
 `FocusVisualStyle="{x:Null}"` on these controls suppresses the default WPF dashed adorner, which is hard to see on the dark palette.
 
 ### `CanEditSettings`
 
 `false` when `Status == Active`. The settings grid sets `IsEnabled="{Binding CanEditSettings}"` so users cannot change idle/movement/duration mid-session (must disable first).
+
+### Theme palette (`App.xaml`)
+
+| Resource | Role |
+|----------|------|
+| `WindowBgBase` | Solid base behind layered radial glows in `MainWindow.xaml` |
+| `AccentPrimary` / `AccentGradient` | Interactive accent (toggles, focus, icons, divider) |
+| `AccentGreen` | Status-only (header, remaining, active dot) |
+| `CardElevation` | Drop shadow on `CardBorder` (Enabled + Status cards) |
+| `InputInsetOuter` / `InputInsetFrame` / `InputBorderInset` | Recessed input field chrome |
 
 ### Status dot colors (`App.xaml`)
 
@@ -593,6 +604,17 @@ Prioritized for the **minimalist utility** philosophy. See README roadmap for a 
 |------|-----------|
 | Custom vector icon replacing Flaticon source | Fully owned branding; schedule for v1.2+ |
 | README / social screenshot refresh after icon pass | Keeps marketing aligned with UI |
+
+### Shipped in v1.2.3
+
+- Purple/navy UI theme: radial background glow, gradient header divider, card elevation shadows, inset inputs
+- Purple primary accent on interactive controls; green reserved for status section
+- README screenshots refreshed (`docs/screenshots/`)
+
+### Shipped in v1.2.2
+
+- Setting-row MDL2 icons, Enabled toggle relocated above Status, explicit Tab order, header gradient divider
+- README screenshots refreshed (`docs/screenshots/`)
 
 ### Shipped in v1.2.1
 
