@@ -485,6 +485,7 @@ Loads state-specific tray ICOs from embedded WPF resources:
 | Action | Behavior |
 |--------|----------|
 | Double-click | Show, restore, activate main window |
+| Balloon click | Show, restore, activate main window (`BalloonTipClicked`) |
 | Context menu | Rebuilt on every `Opening` event |
 
 ### Context menu items
@@ -513,10 +514,10 @@ Truncated to 63 characters (NotifyIcon limit).
 | When | Message |
 |------|---------|
 | Timed session expires | "Session completed" |
-| Session started with **Minimize to tray** (user-initiated) | "Still running in the system tray. Double-click the icon to open settings." |
+| Session started with **Minimize to tray** (user-initiated) | "Still running in the system tray. Click here or double-click the tray icon to open settings." |
 | Window hidden to tray (close/minimize) | Same running-in-tray body (15 s cooldown vs duplicate) |
 
-All use `NotifyIcon.ShowBalloonTip` (3 s, Info icon). Not shown on startup when `"enabled": true` is restored from `settings.json`.
+All use `NotifyIcon.ShowBalloonTip` (3 s, Info icon). `BalloonTipClicked` opens the main window for both balloon types. Not shown on startup when `"enabled": true` is restored from `settings.json`.
 
 ---
 
@@ -675,4 +676,4 @@ Releases are driven by [`scripts/release.ps1`](../scripts/release.ps1) on Window
 
 ---
 
-*Last updated: v1.2.2 — layout relocation, Tab order, setting icons, screenshot refresh — .NET 8 / single-project WPF utility.*
+*Last updated: v1.2.4 — tray balloon click opens settings — .NET 8 / single-project WPF utility.*

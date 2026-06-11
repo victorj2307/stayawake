@@ -219,13 +219,13 @@ Right-click the tray icon:
 
 Double-click the tray icon to open settings.
 
-When a timed session ends, a tray balloon notifies you and status shows **Session completed**.
+When a timed session ends, a tray balloon notifies you and status shows **Session completed**. Click the balloon to open settings.
 
 ### Minimize to tray
 
 With **Minimize to tray** enabled, closing or minimizing the window hides it; the worker and tray icon keep running until you choose **Exit** from the tray.
 
-When you start a session with minimize-to-tray on, or when you hide the window to the tray, a short tray balloon reminds you that StayAwake is still running in the notification area (double-click the tray icon to open settings).
+When you start a session with minimize-to-tray on, or when you hide the window to the tray, a short tray balloon reminds you that StayAwake is still running in the notification area. Click the balloon or double-click the tray icon to open settings.
 
 ---
 
@@ -369,7 +369,7 @@ Tray and UI presets start sessions immediately and update the saved duration pre
 - **Icon:** State-specific embedded ICOs (`app-tray-disabled`, `app-tray-active`, `app-tray-completed`; fallback: `app.ico`, then system default).
 - **Tooltip:** `StayAwake — Active`, `Active (1h 12m)`, `Active (no limit)`, `Disabled`, or `Session completed` (63-char limit).
 - **Menu:** Rebuilt when opened; start presets disabled while a session is active.
-- **Balloons:** "Session completed" when a timed session expires; "Still running in the system tray…" when you enable a session with minimize-to-tray or hide the window to the tray (not on every app restart if a session was already enabled).
+- **Balloons:** "Session completed" when a timed session expires; "Still running in the system tray…" when you enable a session with minimize-to-tray or hide the window to the tray (not on every app restart if a session was already enabled). A single click on either balloon opens settings.
 
 ---
 

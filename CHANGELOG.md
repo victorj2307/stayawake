@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.2.4
+
+- Fix tray balloon notifications so a single click opens settings (session-completed and running-in-tray balloons)
+
 ## v1.2.2
 
 - New icons for settings rows (Segoe MDL2 Assets glyphs in the main window)

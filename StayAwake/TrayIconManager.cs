@@ -22,7 +22,7 @@ public sealed class TrayIconManager : IDisposable
     private DateTime _lastRunningInTrayBalloonUtc = DateTime.MinValue;
 
     private const string RunningInTrayBalloonBody =
-        "Still running in the system tray. Double-click the icon to open settings.";
+        "Still running in the system tray. Click here or double-click the tray icon to open settings.";
 
     public TrayIconManager(Window window, StayAwakeWorker worker, MainViewModel viewModel)
     {
@@ -47,7 +47,8 @@ public sealed class TrayIconManager : IDisposable
             ContextMenuStrip = _menu
         };
 
-        _notifyIcon.DoubleClick += (_, _) => ShowWindow();
+        _notifyIcon.DoubleClick += OnNotifyIconOpenWindow;
+        _notifyIcon.BalloonTipClicked += OnNotifyIconOpenWindow;
         _worker.StatusChanged += OnWorkerStatusChanged;
         UpdateTrayAppearance();
     }
@@ -173,6 +174,8 @@ public sealed class TrayIconManager : IDisposable
         };
     }
 
+    private void OnNotifyIconOpenWindow(object? sender, EventArgs e) => ShowWindow();
+
     private void ShowWindow()
     {
         _window.Show();
@@ -195,6 +198,8 @@ public sealed class TrayIconManager : IDisposable
     public void Dispose()
     {
         _worker.StatusChanged -= OnWorkerStatusChanged;
+        _notifyIcon.DoubleClick -= OnNotifyIconOpenWindow;
+        _notifyIcon.BalloonTipClicked -= OnNotifyIconOpenWindow;
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();
         _menu.Dispose();
