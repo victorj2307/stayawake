@@ -2,7 +2,7 @@
 
 Capture guide for README images. Use a **Release** build on Windows with dark theme enabled.
 
-Last full refresh: **v1.2.5** (Enabled card active highlight).
+Last full refresh: **v1.2.6** (status panel redesign: state headline, remaining-time progress bar, Activity card).
 
 ## Recommended specs
 
@@ -17,9 +17,9 @@ Last full refresh: **v1.2.5** (Enabled card active highlight).
 
 | File | How to capture |
 |------|----------------|
-| `main-active.png` | Enable session, idle 60s, run duration 1h. Status: **Active**, remaining time visible. Enabled card shows green gradient highlight. Captured via `STAYAWAKE_SCREENSHOT=active` (1h session started before window show). |
-| `main-disabled.png` | Enabled off. All settings editable. **Enabled** toggle in the right column above **Status** (standard dark card, no green highlight); run-duration presets under the hours stepper. |
-| `main-session-completed.png` | Let a short session expire, or use `STAYAWAKE_SCREENSHOT=session-completed` (1s session). Status: **Session completed**; **Session ended** row shows local date and time. Enabled card back to standard appearance (toggle off). |
+| `main-active.png` | Enable session, idle 60s, run duration 1h. Status card headline **ACTIVE** (green) with the remaining-time progress bar and large centered countdown; green card highlight; Activity card shows the last-movement time. Captured via `STAYAWAKE_SCREENSHOT=active` (1h session started before window show). |
+| `main-disabled.png` | Toggle off. All settings editable. Status card headline **INACTIVE** with "Windows can sleep normally" and the toggle upper-right (standard dark card, empty progress track); run-duration presets under the hours stepper; **Run in system tray** row with helper text. |
+| `main-session-completed.png` | Let a short session expire, or use `STAYAWAKE_SCREENSHOT=session-completed` (1s session). Status card headline **COMPLETED**; the value shows the session-ended local date and time. Card back to standard appearance (toggle off). |
 | `tray-menu.png` | Synthetic render of the tray menu during an **Active** session (`generate-tray-menu-screenshot.py`; not a live capture). |
 
 ## Capture steps
@@ -66,9 +66,9 @@ $env:STAYAWAKE_SCREENSHOT = "active"
 .\StayAwake\bin\Release\net8.0-windows\StayAwake.exe
 ```
 
-### Disabled (`main-disabled.png`)
+### Inactive (`main-disabled.png`)
 
-Use the same field values with `"enabled": false` and no env var; toggle **Enabled** off if needed.
+Use the same field values with `"enabled": false` and no env var; switch the toggle off if needed.
 
 ### Session completed (`main-session-completed.png`)
 

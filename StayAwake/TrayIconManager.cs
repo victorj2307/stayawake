@@ -124,7 +124,7 @@ public sealed class TrayIconManager : IDisposable
         {
             AppStatus.Active => "● Active",
             AppStatus.SessionCompleted => "● Session completed",
-            _ => "○ Disabled"
+            _ => "○ Inactive"
         };
 
         return new ToolStripMenuItem(label) { Enabled = false };
@@ -170,7 +170,7 @@ public sealed class TrayIconManager : IDisposable
                 $"StayAwake — Active ({SessionDisplay.FormatRemaining(remaining)})",
             AppStatus.Active => "StayAwake — Active",
             AppStatus.SessionCompleted => "StayAwake — Session completed",
-            _ => "StayAwake — Disabled"
+            _ => "StayAwake — Inactive"
         };
     }
 

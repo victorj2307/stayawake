@@ -398,20 +398,20 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 - **Compact utility:** one window, no navigation, no dashboard.
 - **Dark theme:** layered purple/navy background (radial glow from top-left), card-based layout with elevation shadows, inset input chrome, custom toggle/combo/textbox styles in `App.xaml`.
 - **Keyboard focus:** custom templates use an `AccentPrimary` (purple) border on `IsKeyboardFocused` (and `IsKeyboardFocusWithin` / `IsDropDownOpen` where needed); default `FocusVisualStyle` is disabled so Tab navigation matches mouse focus on inputs.
-- **Status accent:** `AccentGreen` is used for the status card (header, remaining countdown, active dot) and for the Enabled toggle card when a session is active (runtime highlight via `DataTrigger` on `Status` in `EnabledCardBorder`); still not used for general keyboard focus.
-- **Session-oriented:** master "Enabled" toggle starts a session; settings lock while active.
-- **Status at a glance:** right column shows state, remaining time (or session ended date/time when completed), last movement time.
+- **Status accent:** `AccentGreen` is reserved **exclusively for the Active state**—the state headline, state icon, large remaining time, remaining-time progress bar, and the active card highlight (runtime highlight via `DataTrigger` on `Status` in `EnabledCardBorder`, `StatusHeadline`, `StatusRemainingLarge`, `StateIcon`); never used for general keyboard focus (purple).
+- **Session-oriented:** master "Enabled" toggle (upper-right of the status card) starts a session; settings lock while active.
+- **Status at a glance:** the status card leads with an `ACTIVE`/`INACTIVE` headline + state icon and a short description; below it a decreasing progress bar and the large, centered remaining time (or session ended date/time when completed). A separate **Activity** card shows the last-movement time.
 
 ### MainWindow layout
 
 | Area | Content |
 |------|---------|
 | Header | App icon + title + tagline; purple-to-blue gradient divider below |
-| Left grid | Idle seconds, movement pixels, direction combo, run duration (hours) + quick presets stacked under the stepper in the value column (30m/1h/3h/∞), minimize-to-tray |
-| Right column | Enabled toggle card (green gradient highlight while active); Status card (state pill + dot, remaining or session ended, last movement) |
+| Left grid | Idle seconds, movement pixels, direction combo, run duration (hours) + quick presets stacked under the stepper in the value column (30m/1h/3h/∞), run-in-system-tray |
+| Right column | Status card (state icon + `ACTIVE`/`INACTIVE` headline, description, Enabled toggle upper-right, remaining-time progress bar, large centered remaining time + caption; green gradient highlight while active); Activity card (last-movement time) |
 | Footer | Version string, Reset settings button |
 
-**Tab order (explicit `TabIndex` 1–11):** idle stepper → movement stepper → direction combo → run-duration stepper → preset chips → minimize-to-tray → Enabled → Reset settings. Status is read-only and skipped.
+**Tab order (explicit `TabIndex` 1–11):** idle stepper → movement stepper → direction combo → run-duration stepper → preset chips → run-in-system-tray → Enabled → Reset settings. Status/Activity are read-only and skipped.
 
 ### Binding strategy
 
@@ -422,7 +422,9 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 - **Input guards:** digits-only `PreviewTextInput`, `MaxLength` (4 / 2 / 2), clamp on blur; values normalized on load via `SettingLimits.Normalize`.
 - **Numeric steppers:** [`NumericStepper`](StayAwake/NumericStepper.xaml) composite control (140×36) with up/down `RepeatButton`s, keyboard Up/Down, and mouse wheel (scroll up increases, scroll down decreases); step sizes from `SettingLimits` (idle 10 s, movement 1 px, run duration 1 h). Stepping updates the bound `*Text` property and pushes to the ViewModel immediately via `UpdateSource()`.
 - **Clamps:** idle 10–3600 s, pixels 1–10, session hours 0–99 (single source in `SettingLimits.cs`).
-- **Status row 2:** `RemainingLabelText` (`"Remaining"` or `"Session ended"`) and `RemainingDisplayText` (countdown, `"Unlimited"`, ended-at via `SessionDisplay.FormatSessionEndedAt`, or `"—"`).
+- **Status card bindings:** `StateHeadlineText` (`ACTIVE`/`INACTIVE`/`COMPLETED`), `StateDescriptionText` (`StayAwake is running` / `Windows can sleep normally` / `Session ended`, single-line/ellipsized so the header height is constant), `RemainingDisplayText` (large value: countdown, `"Unlimited"`, ended-at via `SessionDisplay.FormatSessionEndedAt`, or `"—"`), and `RemainingLabelText` (caption `"Time remaining"`, empty when completed).
+- **Progress bar:** `StatusProgressBar` (`Minimum=0`, `Maximum=1`) is always rendered so the card height stays constant across states. Bound to `RemainingFraction`: remaining ÷ total for a timed active session (decreases), `1` for an unlimited active session (full), `0` when inactive or completed (empty). Updates once per second in lockstep with the countdown (no timer changes).
+- **Activity card:** `LastMovementValue` shows the clock time (`HH:mm:ss`, local) of the last synthetic movement, or `"Never"` before the first jiggle. Stable between movements (no per-second ticking). The label uses an auto-width column so it is never clipped.
 
 ### Keyboard focus styling
 
@@ -430,7 +432,7 @@ All tab stops in the settings UI share the same visible focus treatment:
 
 | Control | Style key | Focus indicator |
 |---------|-----------|-----------------|
-| Enabled / Minimize to tray | `UtilityToggleLarge` / `UtilityToggle` | Purple border on switch track; checked track uses `AccentGradient` (large) or `AccentPrimary` (small) |
+| Enabled / Run in system tray | `UtilityToggleLarge` / `UtilityToggle` | Purple border on switch track; checked track uses `AccentGradient` (large) or `AccentPrimary` (small) |
 | Numeric fields | `NumericStepper` | Purple border on inner field (`PART_TextBox.IsKeyboardFocused`; inset outer frame via `InputInsetOuter` / `InputInsetFrame`) |
 | Movement direction | `UtilityComboBox` | Purple border when focused, focus-within, or dropdown open |
 | Duration presets | `UtilityPresetChip` | Purple border on chip; preferred state adds `PresetBorderActive` outline |
@@ -438,9 +440,9 @@ All tab stops in the settings UI share the same visible focus treatment:
 
 `FocusVisualStyle="{x:Null}"` on these controls suppresses the default WPF dashed adorner, which is hard to see on the dark palette.
 
-### Enabled card active highlight
+### Status card active highlight
 
-When `Status == Active`, the Enabled toggle card (`EnabledCardBorder` in `MainWindow.xaml`, based on `CardBorder`) applies:
+When `Status == Active`, the status card (`EnabledCardBorder` in `MainWindow.xaml`, based on `CardBorder`) applies:
 
 | Resource | Role |
 |----------|------|
@@ -458,31 +460,35 @@ When disabled or session completed, the card reverts to the default `CardBg` / `
 | Resource | Role |
 |----------|------|
 | `WindowBgBase` | Solid base behind layered radial glows in `MainWindow.xaml` |
-| `AccentPrimary` / `AccentGradient` | Interactive accent (toggles, focus, icons, divider) |
-| `AccentGreen` | Status card (header, remaining, active dot); Enabled card active highlight |
-| `EnabledActiveGradient` / `EnabledActiveBorder` | Enabled toggle card background and border while `Status == Active` |
+| `AccentPrimary` / `AccentGradient` | Interactive accent (toggles, focus, icons, divider, section titles) |
+| `AccentGreen` | Active state only: status headline, large remaining time, progress bar, state icon, active card highlight |
+| `ProgressTrack` | Muted track behind the remaining-time progress bar |
+| `EnabledActiveGradient` / `EnabledActiveBorder` | Status card background and border while `Status == Active` |
 | `EnabledCardBorder` | `CardBorder` variant with `DataTrigger` on `AppStatus.Active` |
-| `CardElevation` | Drop shadow on `CardBorder` (Enabled + Status cards) |
+| `StatusHeadline` / `StatusDescription` / `StatusRemainingLarge` / `StatusCaption` / `StateIcon` / `SectionTitle` / `StatusProgressBar` | Status + Activity card typography, state icon, and progress bar |
+| `CardElevation` | Drop shadow on `CardBorder` (Status + Activity cards) |
 | `InputInsetOuter` / `InputInsetFrame` / `InputBorderInset` | Recessed input field chrome |
 
-### Status dot colors (`App.xaml`)
+### State icon + headline colors (`App.xaml`)
 
-| Status | Color |
-|--------|-------|
-| Disabled | Gray (`StatusDisabled`) |
-| Active | Green (`AccentGreen`) |
-| SessionCompleted | Blue (`StatusCompleted`) |
+`StateIcon`, `StatusHeadline`, and `StatusRemainingLarge` switch color/glyph via `DataTrigger` on `Status`:
 
-### Minimize to tray (`MainWindow.xaml.cs`)
+| Status | Headline | Color | State icon glyph |
+|--------|----------|-------|------------------|
+| Disabled | `INACTIVE` | Muted (`StatusDisabled`) | Quiet-hours moon (`&#xE708;`) |
+| Active | `ACTIVE` | Green (`AccentGreen`) | Completed ring-check (`&#xE930;`) |
+| SessionCompleted | `COMPLETED` | Blue (`StatusCompleted`) | Completed ring-check (`&#xE930;`) |
 
-If `MinimizeToTray` is true:
+### Run in system tray (`MainWindow.xaml.cs`)
+
+If `MinimizeToTray` is true (UI label: **Run in system tray**):
 
 - **Close (X):** cancel close, `Hide()` window (app keeps running).
 - **Minimize:** hide window instead of taskbar minimize.
 
-`HideToTray()` shows a tray balloon (when `MinimizeToTray` is on) so users know the app is still in the notification area. Same balloon is shown when the user starts a session with minimize-to-tray enabled (`SessionStarted` in `App.xaml.cs`, skipped on silent restore at startup). Identical running-in-tray balloons are cooldown-limited to 15 seconds in `TrayIconManager`.
+`HideToTray()` shows a tray balloon (when `MinimizeToTray` is on) so users know the app is still in the notification area. Same balloon is shown when the user starts a session with run-in-system-tray enabled (`SessionStarted` in `App.xaml.cs`, skipped on silent restore at startup). Identical running-in-tray balloons are cooldown-limited to 15 seconds in `TrayIconManager`.
 
-Tray and worker continue until Exit from tray menu or close without minimize-to-tray.
+Tray and worker continue until Exit from tray menu or close without run-in-system-tray.
 
 ---
 
@@ -514,7 +520,7 @@ Loads state-specific tray ICOs from embedded WPF resources:
 
 ### Context menu items
 
-1. Status line (disabled): `● Active` / `○ Disabled` / `● Session completed`
+1. Status line (disabled): `● Active` / `○ Inactive` / `● Session completed`
 2. Open settings
 3. Start 30 minutes / 1 hour / 3 hours / indefinitely (disabled while Active)
 4. Stop session (enabled only while Active)
@@ -529,7 +535,7 @@ Updated on `StatusChanged`, marshaled to the UI dispatcher:
 - Active (unlimited): `StayAwake — Active (no limit)`
 - Active (timed): `StayAwake — Active (1h 12m)` via `SessionDisplay.FormatRemaining`
 - Session completed: `StayAwake — Session completed`
-- Disabled: `StayAwake — Disabled`
+- Inactive: `StayAwake — Inactive`
 
 Truncated to 63 characters (NotifyIcon limit).
 
@@ -538,7 +544,7 @@ Truncated to 63 characters (NotifyIcon limit).
 | When | Message |
 |------|---------|
 | Timed session expires | "Session completed" |
-| Session started with **Minimize to tray** (user-initiated) | "Still running in the system tray. Click here or double-click the tray icon to open settings." |
+| Session started with **Run in system tray** (user-initiated) | "Still running in the system tray. Click here or double-click the tray icon to open settings." |
 | Window hidden to tray (close/minimize) | Same running-in-tray body (15 s cooldown vs duplicate) |
 
 All use `NotifyIcon.ShowBalloonTip` (3 s, Info icon). `BalloonTipClicked` opens the main window for both balloon types. Not shown on startup when `"enabled": true` is restored from `settings.json`.
@@ -617,6 +623,14 @@ Prioritized for the **minimalist utility** philosophy. See README roadmap for a 
 |------|-----------|
 | Custom vector icon replacing Flaticon source | Fully owned branding; schedule for v1.2+ |
 | README / social screenshot refresh after icon pass | Keeps marketing aligned with UI |
+
+### Shipped in v1.2.6
+
+- Status panel redesign: `ACTIVE`/`INACTIVE` headline + state icon, description, upper-right toggle, large centered remaining time (`StatusHeadline`, `StatusDescription`, `StateIcon`, `StatusRemainingLarge`, `StatusCaption`)
+- Remaining-time progress bar (`StatusProgressBar`, `RemainingFraction`); green, subtle, always rendered for constant card height (decreases when timed, full when unlimited, empty otherwise), synced to the countdown
+- Separate **Activity** card with the last-movement clock time (`LastMovementValue`)
+- Green reserved exclusively for the Active state; `Minimize to tray` label renamed to `Run in system tray`
+- README screenshots refreshed (`docs/screenshots/`)
 
 ### Shipped in v1.2.5
 
@@ -721,4 +735,4 @@ Releases are driven by [`scripts/release.ps1`](../scripts/release.ps1) on Window
 
 ---
 
-*Last updated: v1.2.4 — tray balloon click opens settings — .NET 8 / single-project WPF utility.*
+*Last updated: v1.2.6 — status panel redesign (state headline, remaining-time progress bar, Activity card, "Run in system tray" label) — .NET 8 / single-project WPF utility.*

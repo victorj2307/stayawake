@@ -300,13 +300,49 @@ public sealed class MainViewModel : INotifyPropertyChanged
     /// <summary>False while running (Active); user must disable to change settings.</summary>
     public bool CanEditSettings => Status != AppStatus.Active;
 
-    public string StatusPillText => Status switch
+    /// <summary>Highest-priority state label in the status card header.</summary>
+    public string StateHeadlineText => Status switch
     {
-        AppStatus.Active => "Active",
-        AppStatus.Disabled => "Disabled",
-        AppStatus.SessionCompleted => "Session completed",
-        _ => "Unknown"
+        AppStatus.Active => "ACTIVE",
+        AppStatus.Disabled => "INACTIVE",
+        AppStatus.SessionCompleted => "COMPLETED",
+        _ => "—"
     };
+
+    /// <summary>Short supporting sentence beneath the state headline.</summary>
+    public string StateDescriptionText => Status switch
+    {
+        AppStatus.Active => "StayAwake is running",
+        AppStatus.Disabled => "Windows can sleep normally",
+        AppStatus.SessionCompleted => "Session ended",
+        _ => string.Empty
+    };
+
+    /// <summary>
+    /// Progress-bar fill (0..1). Timed active session: remaining ÷ total (decreases).
+    /// Unlimited active session: full. Inactive/Completed: empty. Always defined so the
+    /// bar occupies constant height across states.
+    /// </summary>
+    public double RemainingFraction
+    {
+        get
+        {
+            if (Status != AppStatus.Active)
+                return 0;
+
+            var start = _worker.SessionStartedAt;
+            var end = _worker.SessionEndsAt;
+            var remaining = _worker.RemainingTime;
+            if (start is null || end is null || remaining is null)
+                return 1;
+
+            var total = (end.Value - start.Value).TotalSeconds;
+            if (total <= 0)
+                return 0;
+
+            return Math.Clamp(remaining.Value.TotalSeconds / total, 0, 1);
+        }
+    }
 
     public string RemainingTimeValue
     {
@@ -321,7 +357,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
     }
 
     public string RemainingLabelText =>
-        Status == AppStatus.SessionCompleted ? "Session ended" : "Remaining";
+        Status == AppStatus.SessionCompleted ? string.Empty : "Time remaining";
 
     public string RemainingDisplayText
     {
@@ -399,10 +435,12 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private void NotifyStatusProperties()
     {
         OnPropertyChanged(nameof(Status));
-        OnPropertyChanged(nameof(StatusPillText));
+        OnPropertyChanged(nameof(StateHeadlineText));
+        OnPropertyChanged(nameof(StateDescriptionText));
         OnPropertyChanged(nameof(RemainingLabelText));
         OnPropertyChanged(nameof(RemainingTimeValue));
         OnPropertyChanged(nameof(RemainingDisplayText));
+        OnPropertyChanged(nameof(RemainingFraction));
         OnPropertyChanged(nameof(LastMovementValue));
         OnPropertyChanged(nameof(CanEditSettings));
         CommandManager.InvalidateRequerySuggested();

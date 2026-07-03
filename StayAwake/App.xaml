@@ -34,6 +34,7 @@
         <SolidColorBrush x:Key="EnabledActiveBorder" Color="#503DD68C"/>
         <SolidColorBrush x:Key="StatusDisabled" Color="#8A8A8A"/>
         <SolidColorBrush x:Key="StatusCompleted" Color="#7EB8DA"/>
+        <SolidColorBrush x:Key="ProgressTrack" Color="#24243A"/>
         <SolidColorBrush x:Key="ToggleTrackOff" Color="#2E2E3A"/>
         <SolidColorBrush x:Key="ToggleTrackBorder" Color="#4A4A60"/>
         <SolidColorBrush x:Key="ToggleThumb" Color="#F0F0F0"/>
@@ -94,15 +95,6 @@
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
 
-        <Style x:Key="StatusRow" TargetType="Grid">
-            <Setter Property="Margin" Value="0,0,0,6"/>
-            <Setter Property="MinHeight" Value="22"/>
-        </Style>
-
-        <Style x:Key="StatusRowLast" TargetType="Grid" BasedOn="{StaticResource StatusRow}">
-            <Setter Property="Margin" Value="0"/>
-        </Style>
-
         <Style x:Key="StatusLabel" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
@@ -119,6 +111,112 @@
             <Setter Property="Margin" Value="8,0,0,0"/>
         </Style>
 
+        <!-- Status card: state headline (medium-large; green only while Active) -->
+        <Style x:Key="StatusHeadline" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static local:AppStatus.Active}">
+                    <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static local:AppStatus.SessionCompleted}">
+                    <Setter Property="Foreground" Value="{StaticResource StatusCompleted}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Status card: supporting description (small, single line to keep card height constant) -->
+        <Style x:Key="StatusDescription" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="TextWrapping" Value="NoWrap"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+
+        <!-- Status card: state icon (glyph + color follow Status) -->
+        <Style x:Key="StateIcon" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{StaticResource StatusDisabled}"/>
+            <Setter Property="Text" Value="&#xE708;"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static local:AppStatus.Active}">
+                    <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
+                    <Setter Property="Text" Value="&#xE930;"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static local:AppStatus.SessionCompleted}">
+                    <Setter Property="Foreground" Value="{StaticResource StatusCompleted}"/>
+                    <Setter Property="Text" Value="&#xE930;"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Status card: large remaining time (centered; green only while Active) -->
+        <Style x:Key="StatusRemainingLarge" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="34"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static local:AppStatus.Active}">
+                    <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static local:AppStatus.SessionCompleted}">
+                    <Setter Property="Foreground" Value="{StaticResource StatusCompleted}"/>
+                    <Setter Property="FontSize" Value="16"/>
+                    <Setter Property="FontWeight" Value="Normal"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Status card: caption under the remaining value (small, centered) -->
+        <Style x:Key="StatusCaption" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Activity card: section title (purple accent, medium) -->
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentPrimary}"/>
+        </Style>
+
+        <!-- Remaining-time progress bar (subtle; green fill; no text) -->
+        <Style x:Key="StatusProgressBar" TargetType="ProgressBar">
+            <Setter Property="Height" Value="6"/>
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="Maximum" Value="1"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
+            <Setter Property="Background" Value="{StaticResource ProgressTrack}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Border CornerRadius="3"
+                                Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="True">
+                            <Grid ClipToBounds="True">
+                                <Border x:Name="PART_Track"/>
+                                <Border x:Name="PART_Indicator"
+                                        HorizontalAlignment="Left"
+                                        CornerRadius="3"
+                                        Background="{TemplateBinding Foreground}"/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Segoe MDL2 icon -->
         <Style x:Key="IconGlyph" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
@@ -131,21 +229,6 @@
         <Style x:Key="SettingRowIcon" TargetType="TextBlock" BasedOn="{StaticResource IconGlyph}">
             <Setter Property="VerticalAlignment" Value="Top"/>
             <Setter Property="Margin" Value="0,10,0,0"/>
-        </Style>
-
-        <!-- Status dot -->
-        <Style x:Key="StatusDot" TargetType="Ellipse">
-            <Setter Property="Width" Value="8"/>
-            <Setter Property="Height" Value="8"/>
-            <Setter Property="Fill" Value="{StaticResource StatusDisabled}"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Status}" Value="{x:Static local:AppStatus.Active}">
-                    <Setter Property="Fill" Value="{StaticResource AccentGreen}"/>
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Status}" Value="{x:Static local:AppStatus.SessionCompleted}">
-                    <Setter Property="Fill" Value="{StaticResource StatusCompleted}"/>
-                </DataTrigger>
-            </Style.Triggers>
         </Style>
 
         <!-- Toggle switch (small, ~22px) -->

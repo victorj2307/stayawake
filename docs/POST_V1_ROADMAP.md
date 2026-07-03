@@ -59,6 +59,17 @@ Summary of the first iteration after the stable v1.0.0 release. See [BRANCHING.m
 | **Screenshot capture** | `STAYAWAKE_SCREENSHOT=active` for active-state PNG; ScreenshotTool camelCase `settings.json` |
 | **Docs** | Architecture, changelog, and README screenshots updated for v1.2.5 |
 
+## Shipped in v1.2.6
+
+| Initiative | Summary |
+|------------|---------|
+| **Status panel redesign** | Prominent status card: `ACTIVE`/`INACTIVE` headline + state icon, description, upper-right toggle, large centered remaining time + caption; separate **Activity** card for last movement |
+| **Remaining-time progress bar** | Subtle green `StatusProgressBar` bound to `MainViewModel.RemainingFraction` (decreases when timed, full when unlimited, empty otherwise); always occupies constant height; synced to the per-second countdown |
+| **Last movement** | `LastMovementValue` shows the clock time (`HH:mm:ss`) of the last synthetic movement (`Never` before the first jiggle) |
+| **Green reserved for Active** | Green now used only in the active state (headline, remaining, progress, state icon, card highlight) |
+| **Label** | **Minimize to tray** renamed to **Run in system tray** with helper text (setting unchanged) |
+| **Docs** | Architecture, changelog, screenshots README, and README screenshots updated for v1.2.6 |
+
 ## v1.2+ (optional, not blocking)
 
 | Initiative | Summary |

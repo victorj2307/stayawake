@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.2.6
+
+- Redesigned status panel: a prominent status card leads with an **ACTIVE**/**INACTIVE** headline and state icon, a short description (`StayAwake is running` / `Windows can sleep normally`), the on/off toggle in the upper-right, and the remaining time shown large and centered with a `Time remaining` caption
+- New **progress bar** below the header reflects the remaining session time—decreasing during a timed session, full during an unlimited session, empty when inactive or finished; green, subtle, no numbers, synced to the countdown. The bar always occupies the same space so the card height stays constant across states
+- **Last movement** moved to its own **Activity** card, showing the clock time (`HH:mm:ss`) of the last synthetic movement (`Never` before the first jiggle)
+- Green is now reserved exclusively for the **Active** state (headline, remaining time, progress bar, state icon, and the active card highlight)
+- Renamed **Minimize to tray** to **Run in system tray** with the helper text "StayAwake runs in the background." (setting behavior unchanged)
+- README screenshots refreshed for the new status panel
+
 ## v1.2.5
 
 - Enabled toggle card shows a subtle green gradient background and green-tinted border while `Status` is **Active** (`EnabledCardBorder` style)

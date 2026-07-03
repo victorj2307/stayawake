@@ -177,7 +177,7 @@
                         <StackPanel Grid.Column="1" VerticalAlignment="Top">
                             <TextBlock Text="Run duration (hours)" Style="{StaticResource SettingLabel}"/>
                             <TextBlock Text="{Binding SessionDurationHoursRangeHint}" Style="{StaticResource SettingHint}"/>
-                            <TextBlock Text="Presets start immediately. Hours apply when using Enabled."
+                            <TextBlock Text="Presets start immediately. Hours apply when using the toggle."
                                        Style="{StaticResource SettingHint}"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2"
@@ -289,7 +289,10 @@
                             <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="&#xE741;" Style="{StaticResource SettingRowIcon}"/>
-                        <TextBlock Grid.Column="1" Text="Minimize to tray" Style="{StaticResource SettingLabel}"/>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Top">
+                            <TextBlock Text="Run in system tray" Style="{StaticResource SettingLabel}"/>
+                            <TextBlock Text="StayAwake runs in the background." Style="{StaticResource SettingHint}"/>
+                        </StackPanel>
                         <Grid Grid.Column="2" Width="140" HorizontalAlignment="Left">
                             <ToggleButton Style="{StaticResource UtilityToggle}"
                                           IsChecked="{Binding MinimizeToTray}"
@@ -301,82 +304,75 @@
                     </Grid>
             </Grid>
 
-            <!-- Enabled + Status -->
+            <!-- Status + Activity -->
             <StackPanel Grid.Column="2" VerticalAlignment="Top">
-                <Border Style="{StaticResource EnabledCardBorder}" Padding="12,8">
-                    <Grid Height="36">
-                        <TextBlock Text="Enabled"
-                                   FontSize="14"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"/>
-                        <ToggleButton Style="{StaticResource UtilityToggleLarge}"
-                                      IsChecked="{Binding Enabled}"
-                                      KeyboardNavigation.TabIndex="10"
-                                      HorizontalAlignment="Right"
-                                      VerticalAlignment="Center"/>
-                    </Grid>
+                <!-- Status card: state, toggle, progress, remaining time -->
+                <Border Style="{StaticResource EnabledCardBorder}" Padding="14,12">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Style="{StaticResource StateIcon}"
+                                       Margin="0,0,10,0"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding StateHeadlineText}"
+                                       Style="{StaticResource StatusHeadline}"/>
+                            <ToggleButton Grid.Column="2"
+                                          Style="{StaticResource UtilityToggleLarge}"
+                                          IsChecked="{Binding Enabled}"
+                                          KeyboardNavigation.TabIndex="10"
+                                          VerticalAlignment="Center"/>
+                        </Grid>
+
+                        <TextBlock Text="{Binding StateDescriptionText}"
+                                   Style="{StaticResource StatusDescription}"
+                                   Margin="0,4,0,0"/>
+
+                        <ProgressBar Style="{StaticResource StatusProgressBar}"
+                                     Value="{Binding RemainingFraction, Mode=OneWay}"
+                                     Margin="0,14,0,0"/>
+
+                        <TextBlock Text="{Binding RemainingDisplayText}"
+                                   Style="{StaticResource StatusRemainingLarge}"
+                                   Margin="0,14,0,0"/>
+                        <TextBlock Text="{Binding RemainingLabelText}"
+                                   Style="{StaticResource StatusCaption}"
+                                   Margin="0,2,0,0"/>
+                    </StackPanel>
                 </Border>
 
-                <Border Style="{StaticResource CardBorder}" Padding="10,10" Margin="0,10,0,0">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0"
-                               Grid.ColumnSpan="3"
-                               Text="Status"
-                               FontSize="12"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource AccentGreen}"
-                               Margin="0,0,0,6"/>
-
-                    <TextBlock Grid.Row="1"
-                               Grid.Column="0"
-                               Text="State"
-                               Style="{StaticResource StatusLabel}"
-                               Margin="0,0,0,6"/>
-                    <StackPanel Grid.Row="1"
-                                Grid.Column="2"
-                                Orientation="Horizontal"
-                                Margin="0,0,0,6">
-                        <Ellipse Style="{StaticResource StatusDot}" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding StatusPillText}"
-                                   FontSize="12"
-                                   Foreground="{StaticResource TextPrimary}"
-                                   VerticalAlignment="Center"/>
+                <!-- Activity card: last movement -->
+                <Border Style="{StaticResource CardBorder}" Padding="14,12" Margin="0,10,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Activity"
+                                   Style="{StaticResource SectionTitle}"
+                                   Margin="0,0,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Text="&#xE962;"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="14"
+                                       Foreground="{StaticResource IconAccent}"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,8,0"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="Last movement"
+                                       Style="{StaticResource StatusLabel}"/>
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding LastMovementValue}"
+                                       Style="{StaticResource StatusValue}"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Grid>
                     </StackPanel>
-
-                    <TextBlock Grid.Row="2"
-                               Grid.Column="0"
-                               Text="{Binding RemainingLabelText}"
-                               Style="{StaticResource StatusLabel}"
-                               Margin="0,0,0,6"/>
-                    <TextBlock Grid.Row="2"
-                               Grid.Column="2"
-                               Text="{Binding RemainingDisplayText}"
-                               Style="{StaticResource StatusValue}"
-                               Foreground="{StaticResource AccentGreen}"
-                               Margin="0,0,0,6"/>
-
-                    <TextBlock Grid.Row="3"
-                               Grid.Column="0"
-                               Text="Last movement"
-                               Style="{StaticResource StatusLabel}"/>
-                    <TextBlock Grid.Row="3"
-                               Grid.Column="2"
-                               Text="{Binding LastMovementValue}"
-                               Style="{StaticResource StatusValue}"/>
-                </Grid>
                 </Border>
             </StackPanel>
         </Grid>

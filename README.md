@@ -30,16 +30,18 @@ The architecture stays flat on purpose: manual wiring in `App`, one background w
 - **Tray icon states** — disabled, active, and session-completed variants at a glance
 - **System tray** — presets, stop session, open settings
 - **Portable settings** — `settings.json` next to the executable
-- **Dark, compact UI** — single settings screen with live status (including session end date/time after a timed session completes)
+- **Dark, compact UI** — single settings screen with a prominent status card: `ACTIVE`/`INACTIVE` at a glance, remaining time, and a decreasing progress bar (including session end date/time after a timed session completes)
+- **Remaining-time progress bar** — subtle green bar that empties as the timed session counts down
+- **Activity at a glance** — the clock time of the last mouse movement
 - **Single instance** — prevents accidentally running two copies
 
 ---
 
 ## Screenshots
 
-| Active session | Disabled |
+| Active session | Inactive |
 |----------------|----------|
-| ![Main window — active session](docs/screenshots/main-active.png) | ![Main window — disabled](docs/screenshots/main-disabled.png) |
+| ![Main window — active session](docs/screenshots/main-active.png) | ![Main window — inactive](docs/screenshots/main-disabled.png) |
 
 | Session completed (shows **Session ended** time) | Tray menu |
 |-------------------|-----------|
@@ -64,7 +66,7 @@ No administrator rights required to run.
 2. Run it. On first launch, `settings.json` is created beside the EXE. If Windows blocks the app, see [Windows Defender and SmartScreen](#windows-defender-and-smartscreen).
 3. Turn **Enabled** on and set **Idle time** (e.g. `60` seconds).
 4. Leave the PC idle — after the threshold, the mouse nudges once per idle period (cursor stays in place).
-5. Optional: enable **Minimize to tray** and close the window; the app keeps running from the tray icon.
+5. Optional: enable **Run in system tray** and close the window; the app keeps running from the tray icon.
 
 ---
 
@@ -221,11 +223,11 @@ Double-click the tray icon to open settings.
 
 When a timed session ends, a tray balloon notifies you and status shows **Session completed**. Click the balloon to open settings.
 
-### Minimize to tray
+### Run in system tray
 
-With **Minimize to tray** enabled, closing or minimizing the window hides it; the worker and tray icon keep running until you choose **Exit** from the tray.
+With **Run in system tray** enabled, closing or minimizing the window hides it; the worker and tray icon keep running until you choose **Exit** from the tray.
 
-When you start a session with minimize-to-tray on, or when you hide the window to the tray, a short tray balloon reminds you that StayAwake is still running in the notification area. Click the balloon or double-click the tray icon to open settings.
+When you start a session with run-in-system-tray on, or when you hide the window to the tray, a short tray balloon reminds you that StayAwake is still running in the notification area. Click the balloon or double-click the tray icon to open settings.
 
 ---
 
@@ -266,8 +268,8 @@ For state diagrams, worker loop pseudocode, Win32 details, and threading notes, 
 ## UI philosophy
 
 - **Compact utility** — one screen, no tabs or dashboards.
-- **Dark theme** — purple/navy gradient background with radial glow; purple accent on interactive controls; green accent on status and the Enabled card while a session is active; Segoe MDL2 icons for settings rows.
-- **Status sidebar** — state, remaining time (or session ended date/time when completed), last movement—no log viewer.
+- **Dark theme** — purple/navy gradient background with radial glow; purple accent on interactive controls; green reserved exclusively for the **Active** state (status headline, remaining time, progress bar, state icon, and the active card highlight); Segoe MDL2 icons for settings rows.
+- **Status card** — leads with the `ACTIVE`/`INACTIVE` state, a short description, the on/off toggle, a decreasing remaining-time progress bar, and the remaining time (or session ended date/time when completed); a separate **Activity** card shows the last-movement time—no log viewer.
 - **Session-oriented workflow** — enable = start a session; configure duration and idle rules before or between sessions.
 - **Bounded numeric inputs** — muted range hints, clamp on blur, and `NumericStepper` controls for the three numeric settings.
 - **Keyboard-friendly** — Tab through all controls; focused fields show a purple border (matches the dark theme, no dashed system focus rectangle).
@@ -367,7 +369,7 @@ Tray and UI presets start sessions immediately and update the saved duration pre
 ## Tray behavior
 
 - **Icon:** State-specific embedded ICOs (`app-tray-disabled`, `app-tray-active`, `app-tray-completed`; fallback: `app.ico`, then system default).
-- **Tooltip:** `StayAwake — Active`, `Active (1h 12m)`, `Active (no limit)`, `Disabled`, or `Session completed` (63-char limit).
+- **Tooltip:** `StayAwake — Active`, `Active (1h 12m)`, `Active (no limit)`, `Inactive`, or `Session completed` (63-char limit).
 - **Menu:** Rebuilt when opened; start presets disabled while a session is active.
 - **Balloons:** "Session completed" when a timed session expires; "Still running in the system tray…" when you enable a session with minimize-to-tray or hide the window to the tray (not on every app restart if a session was already enabled). A single click on either balloon opens settings.
 
