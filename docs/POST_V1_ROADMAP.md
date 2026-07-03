@@ -45,6 +45,20 @@ Summary of the first iteration after the stable v1.0.0 release. See [BRANCHING.m
 | **Accents** | Purple primary on toggles, focus, icons, presets; green reserved for status section |
 | **Docs** | README screenshots and architecture docs updated for the new theme |
 
+## Shipped in v1.2.4
+
+| Initiative | Summary |
+|------------|---------|
+| **Tray balloons** | Single click on session-completed or running-in-tray balloon opens settings |
+
+## Shipped in v1.2.5
+
+| Initiative | Summary |
+|------------|---------|
+| **Enabled card highlight** | Green gradient on Enabled toggle card when `AppStatus.Active`; `EnabledCardBorder` in `App.xaml` |
+| **Screenshot capture** | `STAYAWAKE_SCREENSHOT=active` for active-state PNG; ScreenshotTool camelCase `settings.json` |
+| **Docs** | Architecture, changelog, and README screenshots updated for v1.2.5 |
+
 ## v1.2+ (optional, not blocking)
 
 | Initiative | Summary |

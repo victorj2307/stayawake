@@ -303,7 +303,7 @@
 
             <!-- Enabled + Status -->
             <StackPanel Grid.Column="2" VerticalAlignment="Top">
-                <Border Style="{StaticResource CardBorder}" Padding="12,8">
+                <Border Style="{StaticResource EnabledCardBorder}" Padding="12,8">
                     <Grid Height="36">
                         <TextBlock Text="Enabled"
                                    FontSize="14"

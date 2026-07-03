@@ -27,6 +27,11 @@
         <SolidColorBrush x:Key="IconAccent" Color="#A855F7"/>
         <SolidColorBrush x:Key="PresetBorderActive" Color="#A855F7"/>
         <SolidColorBrush x:Key="AccentGreen" Color="#3DD68C"/>
+        <LinearGradientBrush x:Key="EnabledActiveGradient" StartPoint="0,0.5" EndPoint="1,0.5">
+            <GradientStop Color="#353DD68C" Offset="0"/>
+            <GradientStop Color="#203DD68C" Offset="1"/>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="EnabledActiveBorder" Color="#503DD68C"/>
         <SolidColorBrush x:Key="StatusDisabled" Color="#8A8A8A"/>
         <SolidColorBrush x:Key="StatusCompleted" Color="#7EB8DA"/>
         <SolidColorBrush x:Key="ToggleTrackOff" Color="#2E2E3A"/>
@@ -55,6 +60,15 @@
             <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Padding" Value="14,12"/>
             <Setter Property="Effect" Value="{StaticResource CardElevation}"/>
+        </Style>
+
+        <Style x:Key="EnabledCardBorder" TargetType="Border" BasedOn="{StaticResource CardBorder}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static local:AppStatus.Active}">
+                    <Setter Property="Background" Value="{StaticResource EnabledActiveGradient}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource EnabledActiveBorder}"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
 
         <!-- Setting rows: margin between rows; controls top-aligned (see SettingRowIcon) -->

@@ -398,7 +398,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 - **Compact utility:** one window, no navigation, no dashboard.
 - **Dark theme:** layered purple/navy background (radial glow from top-left), card-based layout with elevation shadows, inset input chrome, custom toggle/combo/textbox styles in `App.xaml`.
 - **Keyboard focus:** custom templates use an `AccentPrimary` (purple) border on `IsKeyboardFocused` (and `IsKeyboardFocusWithin` / `IsDropDownOpen` where needed); default `FocusVisualStyle` is disabled so Tab navigation matches mouse focus on inputs.
-- **Status accent:** `AccentGreen` is reserved for the status card (header, remaining countdown, active dot)—not used for general interactive focus.
+- **Status accent:** `AccentGreen` is used for the status card (header, remaining countdown, active dot) and for the Enabled toggle card when a session is active (runtime highlight via `DataTrigger` on `Status` in `EnabledCardBorder`); still not used for general keyboard focus.
 - **Session-oriented:** master "Enabled" toggle starts a session; settings lock while active.
 - **Status at a glance:** right column shows state, remaining time (or session ended date/time when completed), last movement time.
 
@@ -408,7 +408,7 @@ Same folder as `StayAwake.exe`—portable when the EXE is copied anywhere.
 |------|---------|
 | Header | App icon + title + tagline; purple-to-blue gradient divider below |
 | Left grid | Idle seconds, movement pixels, direction combo, run duration (hours) + quick presets stacked under the stepper in the value column (30m/1h/3h/∞), minimize-to-tray |
-| Right column | Enabled toggle card; Status card (state pill + dot, remaining or session ended, last movement) |
+| Right column | Enabled toggle card (green gradient highlight while active); Status card (state pill + dot, remaining or session ended, last movement) |
 | Footer | Version string, Reset settings button |
 
 **Tab order (explicit `TabIndex` 1–11):** idle stepper → movement stepper → direction combo → run-duration stepper → preset chips → minimize-to-tray → Enabled → Reset settings. Status is read-only and skipped.
@@ -438,6 +438,17 @@ All tab stops in the settings UI share the same visible focus treatment:
 
 `FocusVisualStyle="{x:Null}"` on these controls suppresses the default WPF dashed adorner, which is hard to see on the dark palette.
 
+### Enabled card active highlight
+
+When `Status == Active`, the Enabled toggle card (`EnabledCardBorder` in `MainWindow.xaml`, based on `CardBorder`) applies:
+
+| Resource | Role |
+|----------|------|
+| `EnabledActiveGradient` | Muted horizontal green gradient (`AccentGreen` at ~20–35% opacity) |
+| `EnabledActiveBorder` | Soft green-tinted card border |
+
+When disabled or session completed, the card reverts to the default `CardBg` / `CardBorderLight` from `CardBorder`.
+
 ### `CanEditSettings`
 
 `false` when `Status == Active`. The settings grid sets `IsEnabled="{Binding CanEditSettings}"` so users cannot change idle/movement/duration mid-session (must disable first).
@@ -448,7 +459,9 @@ All tab stops in the settings UI share the same visible focus treatment:
 |----------|------|
 | `WindowBgBase` | Solid base behind layered radial glows in `MainWindow.xaml` |
 | `AccentPrimary` / `AccentGradient` | Interactive accent (toggles, focus, icons, divider) |
-| `AccentGreen` | Status-only (header, remaining, active dot) |
+| `AccentGreen` | Status card (header, remaining, active dot); Enabled card active highlight |
+| `EnabledActiveGradient` / `EnabledActiveBorder` | Enabled toggle card background and border while `Status == Active` |
+| `EnabledCardBorder` | `CardBorder` variant with `DataTrigger` on `AppStatus.Active` |
 | `CardElevation` | Drop shadow on `CardBorder` (Enabled + Status cards) |
 | `InputInsetOuter` / `InputInsetFrame` / `InputBorderInset` | Recessed input field chrome |
 
@@ -557,7 +570,7 @@ All use `NotifyIcon.ShowBalloonTip` (3 s, Info icon). `BalloonTipClicked` opens 
 ### Notes
 
 - **Single instance** — `Mutex` in `App.OnStartup` prevents a second process; `ReleaseMutex` runs only when this process acquired ownership (avoids shutdown errors on duplicate launch).
-- **Screenshot helper** — `STAYAWAKE_SCREENSHOT=session-completed` starts a 1s session before show (used by `scripts/capture-screenshots.ps1` only).
+- **Screenshot helper** — `STAYAWAKE_SCREENSHOT=active` starts a 1h session before show; `STAYAWAKE_SCREENSHOT=session-completed` starts a 1s session before show (used by `scripts/capture-screenshots.ps1` only).
 
 ---
 
@@ -583,7 +596,7 @@ All use `NotifyIcon.ShowBalloonTip` (3 s, Info icon). `BalloonTipClicked` opens 
 ### Intentional design notes
 
 - Single shared `AppSettings` instance; **worker** owns session lifecycle and writes `Enabled` during start/stop/complete.
-- Preset chip highlight in the main window reflects **saved duration preference** only, not runtime `AppStatus` (active state remains tray icon, status sidebar, and **Enabled** toggle).
+- Preset chip highlight in the main window reflects **saved duration preference** only, not runtime `AppStatus` (active state remains tray icon, status sidebar, **Enabled card green highlight**, and Enabled toggle).
 
 ### Product limitations (by design)
 
@@ -604,6 +617,16 @@ Prioritized for the **minimalist utility** philosophy. See README roadmap for a 
 |------|-----------|
 | Custom vector icon replacing Flaticon source | Fully owned branding; schedule for v1.2+ |
 | README / social screenshot refresh after icon pass | Keeps marketing aligned with UI |
+
+### Shipped in v1.2.5
+
+- Enabled toggle card: green gradient highlight while `AppStatus.Active` (`EnabledCardBorder`, `EnabledActiveGradient`, `EnabledActiveBorder`)
+- Screenshot capture: `STAYAWAKE_SCREENSHOT=active` for `main-active.png`; ScreenshotTool camelCase `settings.json`
+- README screenshots refreshed (`docs/screenshots/`)
+
+### Shipped in v1.2.4
+
+- Tray balloon single-click opens settings (session-completed and running-in-tray balloons)
 
 ### Shipped in v1.2.3
 

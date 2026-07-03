@@ -9,6 +9,12 @@ internal static class Program
 {
     private const string WindowTitle = "StayAwake";
 
+    private static readonly JsonSerializerOptions SettingsJsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
+
     public static int Main(string[] args)
     {
         var repoRoot = args.Length > 0
@@ -37,15 +43,7 @@ internal static class Program
             SessionDurationHours = 0
         });
 
-        CaptureState(exe, exeDir, outDir, "main-active", new AppSettingsDto
-        {
-            Enabled = true,
-            MovementPixels = 1,
-            IdleSeconds = 60,
-            MinimizeToTray = true,
-            MovementMode = "Horizontal",
-            SessionDurationHours = 1
-        });
+        CaptureActive(exe, exeDir, outDir);
 
         CaptureSessionCompleted(exe, exeDir, outDir);
 
@@ -60,6 +58,33 @@ internal static class Program
         using var proc = StartApp(exe, exeDir);
         Thread.Sleep(2000);
         SaveCapture(outDir, name);
+        StopRunning();
+        Thread.Sleep(300);
+    }
+
+    private static void CaptureActive(string exe, string exeDir, string outDir)
+    {
+        StopRunning();
+        WriteSettings(Path.Combine(exeDir, "settings.json"), new AppSettingsDto
+        {
+            Enabled = false,
+            MovementPixels = 1,
+            IdleSeconds = 60,
+            MinimizeToTray = true,
+            MovementMode = "Horizontal",
+            SessionDurationHours = 1
+        });
+
+        var startInfo = new System.Diagnostics.ProcessStartInfo(exe)
+        {
+            WorkingDirectory = exeDir,
+            UseShellExecute = false
+        };
+        startInfo.Environment["STAYAWAKE_SCREENSHOT"] = "active";
+
+        using var proc = System.Diagnostics.Process.Start(startInfo)!;
+        Thread.Sleep(3000);
+        SaveCapture(outDir, "main-active");
         StopRunning();
         Thread.Sleep(300);
     }
@@ -110,7 +135,7 @@ internal static class Program
 
     private static void WriteSettings(string path, AppSettingsDto settings)
     {
-        var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
+        var json = JsonSerializer.Serialize(settings, SettingsJsonOptions);
         File.WriteAllText(path, json);
     }
 

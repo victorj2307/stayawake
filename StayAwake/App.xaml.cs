@@ -51,11 +51,14 @@ public partial class App : System.Windows.Application
 
         _worker.Start();
 
-        if (string.Equals(Environment.GetEnvironmentVariable("STAYAWAKE_SCREENSHOT"), "session-completed", StringComparison.OrdinalIgnoreCase))
+        var screenshotMode = Environment.GetEnvironmentVariable("STAYAWAKE_SCREENSHOT");
+        if (string.Equals(screenshotMode, "session-completed", StringComparison.OrdinalIgnoreCase))
         {
             _worker.StartSession(TimeSpan.FromSeconds(1));
             Thread.Sleep(1500);
         }
+        else if (string.Equals(screenshotMode, "active", StringComparison.OrdinalIgnoreCase))
+            viewModel.StartSession(TimeSpan.FromHours(1), fromSettingsRestore: true);
 
         _tray.Show();
         window.Show();

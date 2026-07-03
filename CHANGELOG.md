@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.5
+
+- Enabled toggle card shows a subtle green gradient background and green-tinted border while `Status` is **Active** (`EnabledCardBorder` style)
+- Fix screenshot capture so `main-active.png` shows a real active session (`STAYAWAKE_SCREENSHOT=active`; ScreenshotTool writes camelCase `settings.json`)
+- README screenshots refreshed for the active-state highlight
+
 ## v1.2.4
 
 - Fix tray balloon notifications so a single click opens settings (session-completed and running-in-tray balloons)
