@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -10,19 +9,17 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <AssemblyName>StayAwake</AssemblyName>
     <RootNamespace>StayAwake</RootNamespace>
-    <Version>1.2.4</Version>
+    <Version>1.2.5</Version>
     <Description>Minimal Windows utility to prevent idle lock via subtle mouse movement.</Description>
   </PropertyGroup>
-
   <ItemGroup>
-    <Compile Remove="scripts\ScreenshotTool\**\*"/>
-    <None Remove="scripts\ScreenshotTool\**\*"/>
-    <None Include="Assets\app-icon-source.png"/>
-    <Resource Include="Assets\app.ico"/>
-    <Resource Include="Assets\app-tray-disabled.ico"/>
-    <Resource Include="Assets\app-tray-active.ico"/>
-    <Resource Include="Assets\app-tray-completed.ico"/>
-    <Resource Include="Assets\app-header.png"/>
+    <Compile Remove="scripts\ScreenshotTool\**\*" />
+    <None Remove="scripts\ScreenshotTool\**\*" />
+    <None Include="Assets\app-icon-source.png" />
+    <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\app-tray-disabled.ico" />
+    <Resource Include="Assets\app-tray-active.ico" />
+    <Resource Include="Assets\app-tray-completed.ico" />
+    <Resource Include="Assets\app-header.png" />
   </ItemGroup>
-
 </Project>
